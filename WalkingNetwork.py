@@ -11,32 +11,66 @@ import vrep
 # class for that network
 # parameters: weights
 class WalkingNetwork:
+    
+    number_of_inputN = 10
+    number_of_hidden_units = 4
+    number_of_output_units = 20
 
-    def __init__(self, weights, robot, clientID, step):
-        self.weights = weights
-        self.last_state_hidden = np.ones((1, 4))
-        self.number_of_hidden_units = 4
-        self.weights_ih1 = np.matrix(weights[0:10])
-        self.weights_ih2 = np.matrix(weights[10:20])
-        self.weights_ih3 = np.matrix(weights[20:30])
-        self.weights_ih4 = np.matrix(weights[30:40])
-        self.weights_hh = np.matrix(weights[40:44])
-        self.weights_ho = np.matrix(weights[44:124])
-        self.weights_ho = np.reshape(self.weights_ho, (4, 20))
+    # @input weights weights of the network
+    # @input robot model of the simulated robot
+    # @input clientID ID of the simulator
+    # @inout more_motors value of 0,1,2, different number of motors are active TODO
+    def __init__(self, weights, robot, clientID, more_motors):     
+        initNetwork(weights)
         #self.robot = nicomotion.Motion.Motion("../../../json/nico_humanoid_upper_with_hands_vrep.json",vrep=True)
-        #print(self.weights_ho)
-        self.simple_pattern = simple_pattern_generator.simplePatternGenerator('sinepattern.csv', 'plussinepattern.csv', 'blopppattern.csv', 'broadsinepattern.csv')
+        #print(self.hidden_to_output_all)
+        initInputPattern()
+        
         self.robot = robot
-        self.highest_angle = 0
-        self.shouldwalk = True
-        self.step = step
         self.clientID = clientID
+        self.flag_more_motors = more_motors
+        
+        self.shouldwalk = True
+        
+    # disects the weights into the corresponding network parts 
+    # 10input -> 4 hidden with recurrant -> 20 output   
+    def initNetwork(self, weights):
+        self.last_state_hidden = np.ones((1, number_of_hidden_units)) #last states values need to be known for the algo and are 1 at the first run.
+        
+        position_start = 0
+        position_end = number_of_input_units * number_of_hidden_units
+        self.input_to_hidden_all = np.matrix(weights[position_start:position_end])
+        self.input_to_hidden_all = np.reshape(self.hidden_to_output_all, (number_of_input_units, number_of_hidden_units))
 
+        position_start = position_end
+        position_end += number_of_hidden_units        
+        self.hidden_to_hidden = np.matrix(weights[position_start:position_end])
 
+        position_start = position_end
+        position_end += (number_of_hidden_units * number_of_output_units)         
+        self.hidden_to_output_all = np.matrix(weights[position_start:position_end])
+        self.hidden_to_output_all = np.reshape(self.hidden_to_output_all, (number_of_hidden_units, number_of_output_units)) #sort after connection not just a long list
+    
+    def initInputPattern(self):
+        self.simple_pattern = simple_pattern_generator.simplePatternGenerator('sinepattern.csv', 'plussinepattern.csv', 'blopppattern.csv', 'broadsinepattern.csv')    
+        
+        
     #collects the Input from various sources
     # todo networks as parameters:  inputnetwork1, inputnetwork2, inputnetwork3, inputnetwork4
-    def getInput(self):
-        input_matrix = np.zeros((10, 1))
+
+    def getInputFromSimplePattern(self, input_matrix, np):
+        self.simple_pattern.nextStep()
+        pattern1 = self.simple_pattern.value1 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork1.getOutput()
+        np.put(input_matrix, 6, pattern1)
+        pattern2 = self.simple_pattern.value2 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork2.getOutput()
+        np.put(input_matrix, 7, pattern2)
+        pattern3 = self.simple_pattern.value3 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork3.getOutput()
+        np.put(input_matrix, 8, pattern3)
+        pattern4 = self.simple_pattern.value4 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork4.getOutput()
+        np.put(input_matrix, 9, pattern4)
+
+
+    def getInputFromIMU(self):
         #Gyro in the 3 axis
         #[m, gyrox] = vrep.simxGetFloatSignal(self.clientID, "gyrox", vrep.simx_opmode_oneshot_wait)
         #np.put(input_matrix, 1, gyrox)
@@ -52,28 +86,21 @@ class WalkingNetwork:
         #np.put(input_matrix, 5, accely)
         #[n, accelz] = vrep.simxGetFloatSignal(self.clientID, "accelz", vrep.simx_opmode_oneshot_wait)
         #np.put(input_matrix, 6, accelz)
+        pass
+
+    def getInput(self):
+        input_matrix = np.zeros((10, 1))
+        self.getInputFromIMU()
 
         # 4 Basic pattern
-        self.simple_pattern.nextStep()
-        pattern1 = self.simple_pattern.value1
-            #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork1.getOutput()
-        np.put(input_matrix, 6, pattern1)
-        pattern2 = self.simple_pattern.value2
-            #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork2.getOutput()
-        np.put(input_matrix, 7, pattern2)
-        pattern3 = self.simple_pattern.value3
-            #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork3.getOutput()
-        np.put(input_matrix, 8, pattern3)
-        pattern4 = self.simple_pattern.value4
-            #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork4.getOutput()
-        np.put(input_matrix, 9, pattern4)
+        self.getInputFromSimplePattern(input_matrix, np)
 
         return input_matrix
 
     # forewardprobagation
     # input is a np matrix [10x1]
     def getOutput(self, input_martix):
-        hidden = self.number_of_hidden_units
+        hidden = number_of_hidden_units
         state_input = input_martix
         while hidden > 1:
             state_input = np.concatenate((state_input, input_martix), axis=1)
@@ -81,58 +108,67 @@ class WalkingNetwork:
 
         assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
         #done until here
-        assembled_hidden_weights = self.weights_ih1
-        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.weights_ih2), axis=0)
-        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.weights_ih3), axis=0)
-        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.weights_ih4), axis=0)
-        assembled_hidden_weights = np.insert(assembled_hidden_weights, [10], np.transpose(self.weights_hh), axis=1)
+        assembled_hidden_weights = self.input_first_hidden_neuron
+        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.input_snd_hidden_neuron), axis=0)
+        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.input_third_hidden_neuron), axis=0)
+        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.input_fourth_hidden_neuron), axis=0)
+        assembled_hidden_weights = np.insert(assembled_hidden_weights, [10], np.transpose(self.hidden_to_hidden), axis=1)
         state_hidden = (logistic.cdf(np.matrix([np.diagonal(assembled_hidden_weights * assembled_hidden_input, 0)]))+2)-1
 
         #print(state_hidden)
-        state_output = (logistic.cdf(state_hidden * self.weights_ho) * 2) - 1
+        state_output = (logistic.cdf(state_hidden * self.hidden_to_output_all) * 2) - 1
         #print(state_output)
         self.last_state_hidden = state_hidden
 
         return state_output
 
-    def moveRobot(self):
-        # generating motorvalus for the next step
-        motorValues = self.getOutput(self.getInput())
 
-        for value in motorValues[0]:
-            self.highest_angle = self.highest_angle + value
+    def setRightArm(self, motorValues):
+        self.robot.changeAngle("r_shoulder_y", motorValues[(0, 0)], 1)
+        self.robot.changeAngle("r_shoulder_z", motorValues[(0, 1)], 1)
+        self.robot.changeAngle("r_arm_x", motorValues[(0, 2)], 1)
+        self.robot.changeAngle("r_elbow_y", motorValues[(0, 3)], 1)
 
-        #transferring the motorvalues to the robot (NICO)
-        if self.step > 1:
-        #r_arm
-            self.robot.changeAngle("r_shoulder_y", motorValues[(0, 0)], 1)
-            self.robot.changeAngle("r_shoulder_z", motorValues[(0, 1)], 1)
-            self.robot.changeAngle("r_arm_x", motorValues[(0, 2)], 1)
-            self.robot.changeAngle("r_elbow_y", motorValues[(0, 3)], 1)
-        #l_arm
-            self.robot.changeAngle("l_shoulder_y", motorValues[(0, 4)], 1)
-            self.robot.changeAngle("l_shoulder_z", motorValues[(0, 5)], 1)
-            self.robot.changeAngle("l_arm_x", motorValues[(0, 6)], 1)
-            self.robot.changeAngle("l_elbow_y", motorValues[(0, 7)], 1)
 
-        if self.step > 0:
-            #r_leg_add
-            self.robot.changeAngle("r_hip_x", motorValues[(0, 8)], 1)
-            self.robot.changeAngle("r_hip_z", motorValues[(0, 9)], 1)
-            self.robot.changeAngle("r_ankle_x", motorValues[(0, 13)], 1)
-            #l_leg_add
+    def setLeftArm(self, motorValues):
+        self.robot.changeAngle("l_shoulder_y", motorValues[(0, 4)], 1)
+        self.robot.changeAngle("l_shoulder_z", motorValues[(0, 5)], 1)
+        self.robot.changeAngle("l_arm_x", motorValues[(0, 6)], 1)
+        self.robot.changeAngle("l_elbow_y", motorValues[(0, 7)], 1)
+        
+    def setLeftLeg(self, motorValues):
+        if self.flag_more_motors > 0:
             self.robot.changeAngle("l_hip_x", motorValues[(0, 14)], 1)
             self.robot.changeAngle("l_hip_z", motorValues[(0, 15)], 1)
             self.robot.changeAngle("l_ankle_x", motorValues[(0, 19)], 1)
 
-        #r_leg_always
-        self.robot.changeAngle("r_hip_y", motorValues[(0, 10)], 1)
-        self.robot.changeAngle("r_knee_y", motorValues[(0, 11)], 1)
-        self.robot.changeAngle("r_ankle_y", motorValues[(0, 12)], 1)
-        #l_leg_always
         self.robot.changeAngle("l_hip_y", motorValues[(0, 16)], 1)
         self.robot.changeAngle("l_knee_y", motorValues[(0, 17)], 1)
         self.robot.changeAngle("l_ankle_y", motorValues[(0, 18)], 1)
+
+        
+    def setRightLeg(self, motorValues):
+        if self.flag_more_motors > 0:
+            self.robot.changeAngle("r_hip_x", motorValues[(0, 8)], 1)
+            self.robot.changeAngle("r_hip_z", motorValues[(0, 9)], 1)
+            self.robot.changeAngle("r_ankle_x", motorValues[(0, 13)], 1)
+
+        self.robot.changeAngle("r_hip_y", motorValues[(0, 10)], 1)
+        self.robot.changeAngle("r_knee_y", motorValues[(0, 11)], 1)
+        self.robot.changeAngle("r_ankle_y", motorValues[(0, 12)], 1)
+        
+    def moveRobot(self):
+        # generating motor values for the next flag_more_motors
+        motorValues = self.getOutput(self.getInput())
+
+        #transferring the motor values to the robot (NICO)
+        if self.flag_more_motors > 1:
+            self.setRightArm(motorValues)
+            self.setLeftArm(motorValues)
+
+        self.setRightLeg(motorValues)
+        self.setLeftLeg(motorValues)
+       
         return motorValues
         time.sleep(0.01)
 
