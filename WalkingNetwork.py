@@ -7,12 +7,13 @@ import random
 import simple_pattern_generator
 import time
 import vrep
+from RobotControl import RobotControl
 
 # class for that network
 # parameters: weights
 class WalkingNetwork:
     
-    number_of_inputN = 10
+    number_of_input_units = 10
     number_of_hidden_units = 4
     number_of_output_units = 20
 
@@ -26,9 +27,7 @@ class WalkingNetwork:
         #print(self.hidden_to_output_all)
         initInputPattern()
         
-        self.robot = robot
-        self.clientID = clientID
-        self.flag_more_motors = more_motors
+        initRobotControl(robot, clientID, more_motors)
         
         self.shouldwalk = True
         
@@ -54,19 +53,20 @@ class WalkingNetwork:
     def initInputPattern(self):
         self.simple_pattern = simple_pattern_generator.simplePatternGenerator('sinepattern.csv', 'plussinepattern.csv', 'blopppattern.csv', 'broadsinepattern.csv')    
         
-        
+    def initRobotControl(self, robot, clientID, more_motors):
+            self.robot_control = RobotControl(robot, clientID, more_motors) 
     #collects the Input from various sources
     # todo networks as parameters:  inputnetwork1, inputnetwork2, inputnetwork3, inputnetwork4
 
     def getInputFromSimplePattern(self, input_matrix, np):
         self.simple_pattern.nextStep()
-        pattern1 = self.simple_pattern.value1 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork1.getOutput()
+        pattern1 = self.simple_pattern.value1 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork1.computeOneStepOnNw()
         np.put(input_matrix, 6, pattern1)
-        pattern2 = self.simple_pattern.value2 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork2.getOutput()
+        pattern2 = self.simple_pattern.value2 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork2.computeOneStepOnNw()
         np.put(input_matrix, 7, pattern2)
-        pattern3 = self.simple_pattern.value3 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork3.getOutput()
+        pattern3 = self.simple_pattern.value3 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork3.computeOneStepOnNw()
         np.put(input_matrix, 8, pattern3)
-        pattern4 = self.simple_pattern.value4 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork4.getOutput()
+        pattern4 = self.simple_pattern.value4 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork4.computeOneStepOnNw()
         np.put(input_matrix, 9, pattern4)
 
 
@@ -99,7 +99,7 @@ class WalkingNetwork:
 
     # forewardprobagation
     # input is a np matrix [10x1]
-    def getOutput(self, input_martix):
+    def computeOneStepOnNw(self, input_martix):
         hidden = number_of_hidden_units
         state_input = input_martix
         while hidden > 1:
@@ -108,12 +108,9 @@ class WalkingNetwork:
 
         assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
         #done until here
-        assembled_hidden_weights = self.input_first_hidden_neuron
-        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.input_snd_hidden_neuron), axis=0)
-        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.input_third_hidden_neuron), axis=0)
-        assembled_hidden_weights = np.concatenate((assembled_hidden_weights, self.input_fourth_hidden_neuron), axis=0)
-        assembled_hidden_weights = np.insert(assembled_hidden_weights, [10], np.transpose(self.hidden_to_hidden), axis=1)
-        state_hidden = (logistic.cdf(np.matrix([np.diagonal(assembled_hidden_weights * assembled_hidden_input, 0)]))+2)-1
+        assembled_hidden_weights = input_to_hidden_all
+        assembled_hidden_weights = np.insert(assembled_hidden_weights, [number_of_input_units], np.transpose(self.hidden_to_hidden), axis=1)
+        state_hidden = (logistic.cdf(np.matrix([np.diagonal(assembled_hidden_weights * assembled_hidden_input, 0)]))+2)-1 # TODO check this please, wtf + names!!
 
         #print(state_hidden)
         state_output = (logistic.cdf(state_hidden * self.hidden_to_output_all) * 2) - 1
@@ -123,64 +120,12 @@ class WalkingNetwork:
         return state_output
 
 
-    def setRightArm(self, motorValues):
-        self.robot.changeAngle("r_shoulder_y", motorValues[(0, 0)], 1)
-        self.robot.changeAngle("r_shoulder_z", motorValues[(0, 1)], 1)
-        self.robot.changeAngle("r_arm_x", motorValues[(0, 2)], 1)
-        self.robot.changeAngle("r_elbow_y", motorValues[(0, 3)], 1)
-
-
-    def setLeftArm(self, motorValues):
-        self.robot.changeAngle("l_shoulder_y", motorValues[(0, 4)], 1)
-        self.robot.changeAngle("l_shoulder_z", motorValues[(0, 5)], 1)
-        self.robot.changeAngle("l_arm_x", motorValues[(0, 6)], 1)
-        self.robot.changeAngle("l_elbow_y", motorValues[(0, 7)], 1)
-        
-    def setLeftLeg(self, motorValues):
-        if self.flag_more_motors > 0:
-            self.robot.changeAngle("l_hip_x", motorValues[(0, 14)], 1)
-            self.robot.changeAngle("l_hip_z", motorValues[(0, 15)], 1)
-            self.robot.changeAngle("l_ankle_x", motorValues[(0, 19)], 1)
-
-        self.robot.changeAngle("l_hip_y", motorValues[(0, 16)], 1)
-        self.robot.changeAngle("l_knee_y", motorValues[(0, 17)], 1)
-        self.robot.changeAngle("l_ankle_y", motorValues[(0, 18)], 1)
-
-        
-    def setRightLeg(self, motorValues):
-        if self.flag_more_motors > 0:
-            self.robot.changeAngle("r_hip_x", motorValues[(0, 8)], 1)
-            self.robot.changeAngle("r_hip_z", motorValues[(0, 9)], 1)
-            self.robot.changeAngle("r_ankle_x", motorValues[(0, 13)], 1)
-
-        self.robot.changeAngle("r_hip_y", motorValues[(0, 10)], 1)
-        self.robot.changeAngle("r_knee_y", motorValues[(0, 11)], 1)
-        self.robot.changeAngle("r_ankle_y", motorValues[(0, 12)], 1)
-        
-    def moveRobot(self):
-        # generating motor values for the next flag_more_motors
-        motorValues = self.getOutput(self.getInput())
-
-        #transferring the motor values to the robot (NICO)
-        if self.flag_more_motors > 1:
-            self.setRightArm(motorValues)
-            self.setLeftArm(motorValues)
-
-        self.setRightLeg(motorValues)
-        self.setLeftLeg(motorValues)
-       
-        return motorValues
-        time.sleep(0.01)
-
-
     #walks in Simulator in scene XY
+    # todo implement better stopvalue
     def walkInSimulator(self):
-        #open scene
-
-        #let the robot walk
-        # todo implement usefull stopvalue
-        while True:
-            self.moveRobot()
+        while self.shouldwalk:
+            motor_values = self.computeOneStepOnNw(self.getInput())
+            self.robot_control.moveRobot(motor_values)
 
 
     #walks on the real NICO-robot
