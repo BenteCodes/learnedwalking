@@ -13,15 +13,17 @@ from RobotControl import RobotControl
 # parameters: weights
 class WalkingNetwork:
     
-    number_of_input_units = 10
+    number_of_input_units = 10 #min 4
     number_of_hidden_units = 4
     number_of_output_units = 20
+    number_of_basic_pattern = 4
 
     # @input weights weights of the network
     # @input robot model of the simulated robot
     # @input clientID ID of the simulator
     # @inout more_motors value of 0,1,2, different number of motors are active TODO
-    def __init__(self, weights, robot, clientID, more_motors):     
+    def __init__(self, weights, robot, clientID, more_motors): 
+        checkParameter(weights, more_motors)    
         initNetwork(weights)
         #self.robot = nicomotion.Motion.Motion("../../../json/nico_humanoid_upper_with_hands_vrep.json",vrep=True)
         #print(self.hidden_to_output_all)
@@ -30,7 +32,16 @@ class WalkingNetwork:
         initRobotControl(robot, clientID, more_motors)
         
         self.shouldwalk = True
+    
+    
+    def checkParameters(self, weights, more_motors):
+        if not(len(weights) == (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)):
+            print("Paramcheck: Weights of incorrect length")
+            
+        if not((-1 < more_motors) and (more_motors < 3)):
+            print("Paramcheck: Wrong motor number, only 0,1,2 allowed")
         
+            
     # disects the weights into the corresponding network parts 
     # 10input -> 4 hidden with recurrant -> 20 output   
     def initNetwork(self, weights):
@@ -55,47 +66,24 @@ class WalkingNetwork:
         
     def initRobotControl(self, robot, clientID, more_motors):
             self.robot_control = RobotControl(robot, clientID, more_motors) 
-    #collects the Input from various sources
-    # todo networks as parameters:  inputnetwork1, inputnetwork2, inputnetwork3, inputnetwork4
-
-    def getInputFromSimplePattern(self, input_matrix, np):
-        self.simple_pattern.nextStep()
-        pattern1 = self.simple_pattern.value1 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork1.computeOneStepOnNw()
-        np.put(input_matrix, 6, pattern1)
-        pattern2 = self.simple_pattern.value2 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork2.computeOneStepOnNw()
-        np.put(input_matrix, 7, pattern2)
-        pattern3 = self.simple_pattern.value3 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork3.computeOneStepOnNw()
-        np.put(input_matrix, 8, pattern3)
-        pattern4 = self.simple_pattern.value4 #todo wieder einfuegen, wenn pasic pattern_network laeuft: inputnetwork4.computeOneStepOnNw()
-        np.put(input_matrix, 9, pattern4)
-
-
-    def getInputFromIMU(self):
-        #Gyro in the 3 axis
-        #[m, gyrox] = vrep.simxGetFloatSignal(self.clientID, "gyrox", vrep.simx_opmode_oneshot_wait)
-        #np.put(input_matrix, 1, gyrox)
-        #[m, gyroy] = vrep.simxGetFloatSignal(self.clientID, "gyroy", vrep.simx_opmode_oneshot_wait)
-        #np.put(input_matrix, 2, gyroy)
-        #[m, gyroz] = vrep.simxGetFloatSignal(self.clientID, "gyroz", vrep.simx_opmode_oneshot_wait)
-        #np.put(input_matrix, 3, gyroz)
-
-        #Accel in the 3 axis
-        #[n, accelx] = vrep.simxGetFloatSignal(self.clientID, "accelz", vrep.simx_opmode_oneshot_wait)
-        #np.put(input_matrix, 4, accelx)
-        #[n, accely] = vrep.simxGetFloatSignal(self.clientID, "accelz", vrep.simx_opmode_oneshot_wait)
-        #np.put(input_matrix, 5, accely)
-        #[n, accelz] = vrep.simxGetFloatSignal(self.clientID, "accelz", vrep.simx_opmode_oneshot_wait)
-        #np.put(input_matrix, 6, accelz)
-        pass
-
+    
+    # need to be a 10x1 matrix for matrix purpises, though only 5 get used
     def getInput(self):
-        input_matrix = np.zeros((10, 1))
-        self.getInputFromIMU()
+        input_matrix = np.zeros((number_of_input_units, 1))
 
-        # 4 Basic pattern
-        self.getInputFromSimplePattern(input_matrix, np)
+        input_matrix = self.getInputFromSimplePattern(input_matrix, np)
 
         return input_matrix
+
+    
+    def getInputFromSimplePattern(self, input_matrix, np):
+        self.simple_pattern.nextStep()
+        
+        for index in range(number_of_basic_pattern):
+            np.put(input_matrix, index, self.simple_pattern[index])
+        
+        return input_matrix
+
 
     # forewardprobagation
     # input is a np matrix [10x1]
@@ -127,19 +115,6 @@ class WalkingNetwork:
             motor_values = self.computeOneStepOnNw(self.getInput())
             self.robot_control.moveRobot(motor_values)
 
-
-    #walks on the real NICO-robot
-    def walkRobot(self):
-        i = 0
-        while i < 400:
-            self.moveRobot()
-            torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
-            [m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
-            if position_robot[2] < 0.2:
-                break
-            #print('walking' + str(i))
-            i = i + 1
-        #print('finished moving')
 
     def resetNetwork(self):
         self.last_state_hidden = np.ones((1, 4))
