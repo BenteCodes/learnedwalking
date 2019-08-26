@@ -31,7 +31,7 @@ class WalkingNetwork:
         
         initRobotControl(robot, clientID, more_motors)
         
-        self.shouldwalk = True
+        #self.shouldwalk = True
     
     
     def checkParameters(self, weights, more_motors):
@@ -87,12 +87,11 @@ class WalkingNetwork:
 
     # forewardprobagation
     # input is a np matrix [10x1]
-    def computeOneStepOnNw(self, input_martix):
+    def computeOneStepOnNw(self, state_input):
         hidden = number_of_hidden_units
-        state_input = input_martix
         while hidden > 1:
             state_input = np.concatenate((state_input, input_martix), axis=1)
-            hidden = hidden - 1
+            hidden -=  1
 
         assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
         #done until here
@@ -111,7 +110,8 @@ class WalkingNetwork:
     #walks in Simulator in scene XY
     # todo implement better stopvalue
     def walkInSimulator(self):
-        while self.shouldwalk:
+        #while self.shouldwalk:
+        while True:
             motor_values = self.computeOneStepOnNw(self.getInput())
             self.robot_control.moveRobot(motor_values)
 

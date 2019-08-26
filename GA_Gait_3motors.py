@@ -11,176 +11,191 @@ from nicomotion import Motion
 
 # genetic algorithm to learn basic pattern
 class GA_Gait:
+    networksize = 124
+    factor = 1
+    robot_string = "../json/nico_humanoid_full_with_grippers_unchecked.json"
 # initialize randomly 20 networks of type 1
-    def __init__(self, size, mutation_rate, crossover_rate, iterations, step):
-        self._population = []
-        self.crossover_rate = crossover_rate
-        self.mutation_rate = mutation_rate
-        self.size_of_population = size
-        self.current_iteration = 0
-        self.max_iterations = iterations
-        self.robot = Motion.Motion("../json/nico_humanoid_full_with_grippers_unchecked.json", vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
+
+    def initSimulation(self):
+        self.robot = Motion.Motion(robot_string, vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
         vrep.simxFinish(-1)
         self.clientID = vrep.simxStart('127.0.0.1', 19996, True, True, 5000, 5)
-        print(self.clientID)
-        self.ranking = []
-        self.networksize = 124
-        self.factor = 1
-        self.step = step
 
+
+    def init_GA(self, popsize, mutation_rate, crossover_rate, iterations):
+        self.crossover_rate = crossover_rate
+        self.mutation_rate = mutation_rate
+        self.size_of_population = popsize
+        self.current_iteration = 0
+        self.max_iterations = iterations
+
+
+    def init_population(self, popsize):
         i = 0
-        j = 0
-        #todo Adapt to walking_network
-        while i < size:
+        j = 0 #todo Adapt to walking_network
+        while i < popsize:
             weights = []
             while j < self.networksize:
-                weights.append(random.uniform(-10, 10))
-                j = j + 1
-            new_network = WalkingNetwork.WalkingNetwork(weights, self.robot, self.clientID, self.step)
-            self._population.append(new_network)
-            self.ranking.append(size-i)
-            i = i + 1
+                weights.append(random.uniform(-1, 1))
+                j += 1
+            
+            new_network = WalkingNetwork.WalkingNetwork(weights, self.robot, self.clientID, self.motor_factor)
+            self.population.append(new_network)
+            self.ranking.append(popsize - i)
+            i += 1
             j = 0
+
+    def __init__(self, popsize, mutation_rate, crossover_rate, iterations, motor_factor):
+        self.population = []
+        self.ranking = []
+        
+        self.init_GA(popsize, mutation_rate, crossover_rate, iterations)
+        
+        self.initSimulation()
+        
+        self.motor_factor = motor_factor
+
+        self.init_population(popsize)
 
 # define fitness function (maybe from parameter)
 
 # map fittness function and output to get the error
-    def calculateFitness(self, network):
-        fitness = 0
 
-        print('start simulation')
+    def penalizeFalling(self, position_robot):
+        if position_robot[2] < 0.4: # robotFellDownThreshold
+            fitness -= 100 #relly don't fall
+        return fitness
+
+
+    def penalizeNonMovement(self, network):
+        if network.highest_angle == 0: #if there is 0 movement
+            fitness -= 2000
+        return fitness
+
+
+    def calcDistanceMoved(self, position_ref, position_robot_foot_r, position_robot_foot_l):
+        distance_r = math.sqrt((math.pow((position_ref[0] - position_robot_foot_r[0]), 2)) + (math.pow((position_ref[1] - position_robot_foot_r[1]), 2)) + (math.pow((position_ref[2] - position_robot_foot_r[2]), 2)))
+        distance_l = math.sqrt((math.pow((position_ref[0] - position_robot_foot_l[0]), 2)) + (math.pow((position_ref[1] - position_robot_foot_l[1]), 2)) + (math.pow((position_ref[2] - position_robot_foot_l[2]), 2)))
+        fitness += (distance_l + distance_r) / 2
+        return fitness
+
+
+    def stopSimulation(self, vrep):
+        return vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
+
+
+    def startSimulation(self):
         time.sleep(0.5)
         vrep.simxStartSimulation(self.clientID, vrep.simx_opmode_oneshot)
         time.sleep(0.5)
-        #print('start moving')
-        network.walkRobot()
+
+
+    def getEvalData(self):
         cube_handle = vrep.simxGetObjectHandle(self.clientID, "reference_cube", vrep.simx_opmode_oneshot_wait)
-        [m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait)
-        #print(position_ref)
+        [m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_ref)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "right_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
         [m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "left_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
-        [m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
-        #print(position_robot_foot)
+        [m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_robot_foot)
         torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
         [m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
+        return position_robot, position_ref, position_robot_foot_r, position_robot_foot_l
 
-        #print(network.highest_angle)
-        #was at least one joint moved
-        if network.highest_angle == 0:
-            fitness = -2000
+    def obtainFitness(self, network):
+        fitness = 0
 
-        if position_robot[2] < 0.4:
-            fitness = fitness - 1.2
+        print('start simulation')
+        self.startSimulation()
+        #print('start moving')
+        network.walkRobot()
+        position_robot, position_ref, position_robot_foot_r, position_robot_foot_l = self.getEvalData()
 
-        #how far did the robot move
-        distance_r = math.sqrt((math.pow((position_ref[0]-position_robot_foot_r[0]), 2)) + (math.pow((position_ref[1]-position_robot_foot_r[1]), 2)) + (math.pow((position_ref[2]-position_robot_foot_r[2]),2)))
-        distance_l = math.sqrt((math.pow((position_ref[0]-position_robot_foot_l[0]), 2)) + (math.pow((position_ref[1]-position_robot_foot_l[1]), 2)) + (math.pow((position_ref[2]-position_robot_foot_l[2]),2)))
-        fitness = fitness + ((distance_l + distance_r)/2)
+        fitness = self.penalizeNonMovement(network)
+
+        fitness = self.penalizeFalling(position_robot)
+
+        fitness = self.calcDistanceMoved(position_ref, position_robot_foot_r, position_robot_foot_l)
         #how fast did the robot move
         #distance / time_needed
-        #fitness = fitness #+velocity bonus
+        #fitness += #+velocity bonus
         print('fitness:' + str(fitness))
-        vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
+        
+        self.stopSimulation(vrep)
         print('stopped simulation')
 
         return fitness
 
-    def changeNetworkStep(self):
-        self.step = self.step + 1
-        for network in self._population:
-            network.step = network.step + 1
-            if self.step > 1:
-                i = 44
-                while i < 76:
-                    network.weights[i] = 0
-                    i = +1
-            else:
-                i = 84
-                while i < 96:
-                    network.weights[i] = 0
-                    i = +1
-                i = 108
-                while i < 120:
-                    network.weights[i] = 0
-                    i = +1
 
+
+    def runXTimes(self, network, times):
+        fitness = 0
+        for x in range(0, times):
+            fitness += self.obtainFitness(network)
+            network.resetNetwork()
+        
+        fitness /= 3
+        return fitness
 
     def getBestNetworks(self):
 
         bestNetworks = []
         fitnessList = []
 
-        for network in self._population:
-            print(self._population.index(network))
-            fitness = 0
-            for x in range(0, 3):
-                fitness = fitness + self.calculateFitness(network)
-                network.resetNetwork()
-            fitness = fitness / 3
+        for network in self.population:
+            fitness = self.runXTimes(network, 3)
             fitnessList.append(fitness)
 
-        numpyfitness = np.array(fitnessList)
-        revindices = np.argsort(numpyfitness)
-        indices = np.flipud(revindices)
+        indices = np.flipud(np.argsort(np.array(fitnessList)))
         meanfitness = np.mean(fitnessList)
-        bestIndizes = np.argsort(numpyfitness)[:5]
-        bestFitness = []
 
         for index in indices:
-            bestNetworks.append(self._population[index])
+            bestNetworks.append(self.population[index])
 
-
-        for index in bestIndizes:
-            bestFitness.append(self._population[index])
         self.safeFitness(meanfitness, bestFitness)
 
+        np.array(sortby(x.axis,1))
         return bestNetworks
 
-    def selectOne(self):
+    def getRandomIndexBetterPreferred(self):
         #print('selection')
-        maximum = 0
-        i = 0
-        while i < len(self.ranking):
-            maximum = maximum + self.ranking[i]
-            i = i + 1
+        maximum = sum(range(self.size_of_population + 1))
         pick = random.uniform(0, maximum)
+        
         current = 0
-        i = 0
-        while i < len(self.ranking):
-            current += self.ranking[i]
+        counter = self.size_of_population
+        for i in range(0, len(self.ranking)):
+            current += counter
             if current >= pick:
                 return i
-            i += 1
-
+            counter -= 1
 
 
     # create the next generation
     def createNextGeneration(self, bestNetworks):
         print('Next Generation')
-        self._population = []
+        self.population = []
         bestNetworks[0].resetNetwork()
         bestNetworks[1].resetNetwork()
-        self._population.append(bestNetworks[0])
-        self._population.append(bestNetworks[1])
+        self.population.append(bestNetworks[0])
+        self.population.append(bestNetworks[1])
 
-        while len(self._population) < self.size_of_population:
+        while len(self.population) < self.size_of_population:
             probability = random.randint(0, 100)
             #crossover with probable mutation
             if probability <= self.crossover_rate:
-                child_network = self.crossoverNetwork(bestNetworks[self.selectOne()], bestNetworks[self.selectOne()])
+                child_network = self.crossoverNetwork(bestNetworks[self.getRandomIndexBetterPreferred()], bestNetworks[self.getRandomIndexBetterPreferred()])
                 mutate = random.randint(0, 1)
                 if mutate == 1:
                     self.createMutantNetwork(child_network)
-                    self._population.append(child_network)
+                    self.population.append(child_network)
                     continue
             else:
                 #only mutation
                 #print(m)
                 #print(len(best5Networks))
-                child_network = self.createMutantNetwork(bestNetworks[self.selectOne()])
-                self._population.append(child_network)
-        #print(self._population)
+                child_network = self.createMutantNetwork(bestNetworks[self.getRandomIndexBetterPreferred()])
+                self.population.append(child_network)
+        #print(self.population)
 
     def createMutantNetwork(self, network):
         new_weights = []
@@ -190,7 +205,7 @@ class GA_Gait:
                 mutation = random.uniform(-self.factor, self.factor)
                 weight = weight + mutation
             new_weights.append(weight)
-        child_network = WalkingNetwork.WalkingNetwork(new_weights, self.robot, self.clientID, self.step)
+        child_network = WalkingNetwork.WalkingNetwork(new_weights, self.robot, self.clientID, self.motor_factor)
         return child_network
 
     def crossoverNetwork(self, network1, network2):
@@ -205,7 +220,7 @@ class GA_Gait:
             else:
                 new_weights.append(network2.weights[fill])
                 fill = fill + 1
-        child_network = WalkingNetwork.WalkingNetwork(new_weights, self.robot, self.clientID, self.step)
+        child_network = WalkingNetwork.WalkingNetwork(new_weights, self.robot, self.clientID, self.motor_factor)
         return child_network
 
     def safeFitness(self, meanfitness, best5Fitness):
