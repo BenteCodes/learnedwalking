@@ -1,18 +1,19 @@
 
 import WalkingNetwork
+from Populationgenerator import PopulationGenerator
 import random
 import numpy as np
-import vrep
 import math
 import time
-import csv
+import vrep
 from nicomotion import Motion
+import csv
+
 
 
 # genetic algorithm to learn basic pattern
 class GA_Gait:
     networksize = 124
-    factor = 1
     robot_string = "../json/nico_humanoid_full_with_grippers_unchecked.json"
 # initialize randomly 20 networks of type 1
 
@@ -28,6 +29,7 @@ class GA_Gait:
         self.size_of_population = popsize
         self.current_iteration = 0
         self.max_iterations = iterations
+        self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
 
 
     def init_population(self, popsize):
@@ -41,13 +43,11 @@ class GA_Gait:
             
             new_network = WalkingNetwork.WalkingNetwork(weights, self.robot, self.clientID, self.motor_factor)
             self.population.append(new_network)
-            self.ranking.append(popsize - i)
             i += 1
             j = 0
 
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations, motor_factor):
         self.population = []
-        self.ranking = []
         
         self.init_GA(popsize, mutation_rate, crossover_rate, iterations)
         
@@ -136,8 +136,7 @@ class GA_Gait:
         fitness /= 3
         return fitness
 
-    def getBestNetworks(self):
-
+    def getRankedNetworks(self):
         bestNetworks = []
         fitnessList = []
 
@@ -156,72 +155,6 @@ class GA_Gait:
         np.array(sortby(x.axis,1))
         return bestNetworks
 
-    def getRandomIndexBetterPreferred(self):
-        #print('selection')
-        maximum = sum(range(self.size_of_population + 1))
-        pick = random.uniform(0, maximum)
-        
-        current = 0
-        counter = self.size_of_population
-        for i in range(0, len(self.ranking)):
-            current += counter
-            if current >= pick:
-                return i
-            counter -= 1
-
-
-    # create the next generation
-    def createNextGeneration(self, bestNetworks):
-        print('Next Generation')
-        self.population = []
-        bestNetworks[0].resetNetwork()
-        bestNetworks[1].resetNetwork()
-        self.population.append(bestNetworks[0])
-        self.population.append(bestNetworks[1])
-
-        while len(self.population) < self.size_of_population:
-            probability = random.randint(0, 100)
-            #crossover with probable mutation
-            if probability <= self.crossover_rate:
-                child_network = self.crossoverNetwork(bestNetworks[self.getRandomIndexBetterPreferred()], bestNetworks[self.getRandomIndexBetterPreferred()])
-                mutate = random.randint(0, 1)
-                if mutate == 1:
-                    self.createMutantNetwork(child_network)
-                    self.population.append(child_network)
-                    continue
-            else:
-                #only mutation
-                #print(m)
-                #print(len(best5Networks))
-                child_network = self.createMutantNetwork(bestNetworks[self.getRandomIndexBetterPreferred()])
-                self.population.append(child_network)
-        #print(self.population)
-
-    def createMutantNetwork(self, network):
-        new_weights = []
-        for weight in network.weights:
-            # probability to mutate into weightmutation
-            if random.randint(1, 100) <= self.mutation_rate:
-                mutation = random.uniform(-self.factor, self.factor)
-                weight = weight + mutation
-            new_weights.append(weight)
-        child_network = WalkingNetwork.WalkingNetwork(new_weights, self.robot, self.clientID, self.motor_factor)
-        return child_network
-
-    def crossoverNetwork(self, network1, network2):
-        crossover_point = random.randint(0, self.networksize)
-        new_weights = []
-        fill = 0
-        while fill < self.networksize:
-            if fill <= crossover_point:
-                #print(fill)
-                new_weights.append(network1.weights[fill])
-                fill = fill + 1
-            else:
-                new_weights.append(network2.weights[fill])
-                fill = fill + 1
-        child_network = WalkingNetwork.WalkingNetwork(new_weights, self.robot, self.clientID, self.motor_factor)
-        return child_network
 
     def safeFitness(self, meanfitness, best5Fitness):
         with open('fitnessmoremotors_static.csv', 'a') as csvfile1:
@@ -242,10 +175,10 @@ class GA_Gait:
 
     def evolve(self):
         while self.current_iteration < self.max_iterations:
-            bestNetworks = self.getBestNetworks()
-            self.createNextGeneration(bestNetworks)
-            self.current_iteration = self.current_iteration + 1
-            self.safeNetwork(bestNetworks[0])
+            rankedNetworks = self.getRankedNetworks()
+            self.pop_generator.createNextGeneration(rankedNetworks)
+            self.current_iteration += 1
+            self.safeNetwork(rankedNetworks[0])
             print(self.current_iteration)
 
 
