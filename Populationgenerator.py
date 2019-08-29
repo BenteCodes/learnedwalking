@@ -52,7 +52,7 @@ class PopulationGenerator:
                 weight += mutation
             new_weights.append(weight)
             
-        return network.newNWWithDifferentWeights(new_weights)
+        return WalkingNetwork(new_weights)
 
     def crossoverNetwork(self, network1, network2):
         crossover_point = random.randint(0, network1.getNumberOfWeights())
@@ -63,7 +63,7 @@ class PopulationGenerator:
             else:
                 new_weights.append(network2.weights[index])
             index += 1
-        return network1.newNWWithDifferentWeights(new_weights)
+        return WalkingNetwork(new_weights)
     
     def getRandomIndexBetterPreferred(self, ranked):
         rankSum = sum(range(self.size_of_population + 1))

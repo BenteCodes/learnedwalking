@@ -1,13 +1,10 @@
 # Imports und so
 import numpy as np
 from scipy.stats import logistic
-import Network
 import random
 #from nicomotion import Motion
-import simple_pattern_generator
+from SimplePatternGenerator import SimplePatternGenerator
 import time
-import vrep
-from RobotControl import RobotControl
 
 # class for that network
 # parameters: weights
@@ -23,14 +20,11 @@ class WalkingNetwork:
     # @input robot model of the simulated robot
     # @input clientID ID of the simulator
     # @inout more_motors value of 0,1,2, different number of motors are active TODO
-    def __init__(self, weights, robot, clientID, more_motors): 
+    def __init__(self, weights): 
         checkParameter(weights, more_motors)    
         initNetwork(weights)
-        #self.robot = nicomotion.Motion.Motion("../../../json/nico_humanoid_upper_with_hands_vrep.json",vrep=True)
         #print(self.hidden_to_output_all)
         initInputPattern()
-        
-        initRobotControl(robot, clientID, more_motors)
         
         #self.shouldwalk = True
     
@@ -63,10 +57,7 @@ class WalkingNetwork:
         self.hidden_to_output_all = np.reshape(self.hidden_to_output_all, (number_of_hidden_units, number_of_output_units)) #sort after connection not just a long list
     
     def initInputPattern(self):
-        self.simple_pattern = simple_pattern_generator.simplePatternGenerator('sinepattern.csv', 'plussinepattern.csv', 'blopppattern.csv', 'broadsinepattern.csv')    
-        
-    def initRobotControl(self, robot, clientID, more_motors):
-            self.robot_control = RobotControl(robot, clientID, more_motors) 
+        self.simple_pattern = SimplePatternGenerator('sinepattern.csv', 'plussinepattern.csv', 'blopppattern.csv', 'broadsinepattern.csv')    
     
     # need to be a 10x1 matrix for matrix purpises, though only 5 get used
     def getInput(self):
@@ -88,7 +79,8 @@ class WalkingNetwork:
 
     # forewardprobagation
     # input is a np matrix [10x1]
-    def computeOneStepOnNw(self, state_input):
+    def computeOneStepOnNw(self):
+        state_input = self.getInput()
         hidden = number_of_hidden_units
         while hidden > 1:
             state_input = np.concatenate((state_input, input_martix), axis=1)
@@ -108,23 +100,19 @@ class WalkingNetwork:
         return state_output
 
 
-    #walks in Simulator in scene XY
-    # todo implement better stopvalue
-    def walkInSimulator(self):
-        #while self.shouldwalk:
-        while True:
-            motor_values = self.computeOneStepOnNw(self.getInput())
-            self.robot_control.moveRobot(motor_values)
-
-
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, 4))
-    
-    def newNWWithDifferentWeights(self, weights):
-        return WalkingNetwork(weights, self.robot_control.robot, self.robot_control.clientID, self.robot_control.more_motors)
     
     def getWeights(self):
         return self.weights
     
     def getNumberOfWeights(self):
         return self.number_of_weights
+    
+    @staticmethod
+    def createRandomNetwork(self):
+        weights = []
+        for i in range(0, self.getNumberOfWeights()):
+            weights.append(random.uniform(-1, 1))
+            
+        return WalkingNetwork(weights)
