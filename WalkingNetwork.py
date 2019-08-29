@@ -16,6 +16,7 @@ class WalkingNetwork:
     number_of_input_units = 10 #min 4
     number_of_hidden_units = 4
     number_of_output_units = 20
+    number_of_weights = (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)
     number_of_basic_pattern = 4
 
     # @input weights weights of the network
@@ -31,12 +32,12 @@ class WalkingNetwork:
         
         initRobotControl(robot, clientID, more_motors)
         
-        self.shouldwalk = True
+        #self.shouldwalk = True
     
     
     def checkParameters(self, weights, more_motors):
-        if not(len(weights) == (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)):
-            print("Paramcheck: Weights of incorrect length")
+        if not(len(weights) == self.number_of_weights):
+            print("Paramcheck: Weights of incorrect number_of_weights")
             
         if not((-1 < more_motors) and (more_motors < 3)):
             print("Paramcheck: Wrong motor number, only 0,1,2 allowed")
@@ -87,12 +88,11 @@ class WalkingNetwork:
 
     # forewardprobagation
     # input is a np matrix [10x1]
-    def computeOneStepOnNw(self, input_martix):
+    def computeOneStepOnNw(self, state_input):
         hidden = number_of_hidden_units
-        state_input = input_martix
         while hidden > 1:
             state_input = np.concatenate((state_input, input_martix), axis=1)
-            hidden = hidden - 1
+            hidden -=  1
 
         assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
         #done until here
@@ -111,24 +111,20 @@ class WalkingNetwork:
     #walks in Simulator in scene XY
     # todo implement better stopvalue
     def walkInSimulator(self):
-        while self.shouldwalk:
+        #while self.shouldwalk:
+        while True:
             motor_values = self.computeOneStepOnNw(self.getInput())
             self.robot_control.moveRobot(motor_values)
 
 
-    def resetNetwork(self):
+    def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, 4))
-
-#weigts1 = [random.randint(-5,5) for _ in range(12)]
-#weigts2 = [random.randint(-5,5) for _ in range(12)]
-#weigts3 = [random.randint(-5,5) for _ in range(12)]
-#weigts4 = [random.randint(-5,5) for _ in range(12)]
-#bpn1 = Network.BasicPGN(weigts1, 1, 2)
-#bpn2 = Network.BasicPGN(weigts2, 1, 2)
-#bpn3 = Network.BasicPGN(weigts3, 1, 2)
-#bpn4 = Network.BasicPGN(weigts4, 1, 2)
-#mylist = [random.uniform(-5, 5) for _ in range(124)]
-#print(len(mylist))
-#robot = Motion.Motion("../json/nico_humanoid_full_with_grippers_unchecked.json", vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
-#testgait = WalkingNetwork(mylist, robot)
-#testgait.walkRobot()
+    
+    def newNWWithDifferentWeights(self, weights):
+        return WalkingNetwork(weights, self.robot_control.robot, self.robot_control.clientID, self.robot_control.more_motors)
+    
+    def getWeights(self):
+        return self.weights
+    
+    def getNumberOfWeights(self):
+        return self.number_of_weights
