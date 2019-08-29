@@ -1,38 +1,33 @@
-
-
 class RobotControl:
-    def __init__(self, robot, clientID, more_motors): 
-         self.robot = robot
-         self.clientID = clientID
-         self.more_motors = more_motors
+    def __init__(self, robot, clientID, more_motors):
+        self.robot = robot
+        self.clientID = clientID
+        self.more_motors = more_motors
          
      #walks on the real NICO-robot
     def walkRobot(self):
-         i = 0
-         while i < 400:
+        i = 0
+        while i < 400:
             self.moveRobot()
             torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
             [m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
             if position_robot[2] < 0.2:
                 break
-            #print('walking' + str(i))
-            i = i + 1
-        #print('finished moving')
-      
-      
-	 def moveRobot(self, motor_values):
-	        # generating motor values for the next flag_more_motors
-	        if self.more_motors > 0 :
-	            full_legs = true
+            i += 1
+
+    def moveRobot(self, motor_values):
+        if self.more_motors > 0:
+            full_legs = true
+        if self.more_motors > 0:
+            full_legs = true
+	    self.setRightLeg(motor_values, full_legs)
+	    self.setLeftLeg(motor_values, full_legs)
 	        
-	        self.setRightLeg(motor_values, full_legs)
-	        self.setLeftLeg(motor_values, full_legs)
-	        
-	        if self.more_motors > 1:
-	            self.setRightArm(motor_values)
-	            self.setLeftArm(motor_values)
+	    if self.more_motors > 1:
+	        self.setRightArm(motor_values)
+	        self.setLeftArm(motor_values)
 	
-	        time.sleep(0.01)
+	    time.sleep(0.01)
  
  
     def setRightArm(self, motorValues):
