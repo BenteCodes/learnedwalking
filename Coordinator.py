@@ -1,53 +1,50 @@
 from WalkingNetwork import WalkingNetwork
-from Populationgenerator import PopulationGenerator
+from PopulationGenerator import PopulationGenerator
 from FitnessFunction import FitnessFunction
+from RobotControl import RobotControl
 import SafeData
-import random
-import numpy as np
-import math
-import time
-import csv
 
 
 class Coordinator:
 
-    def init_GA(self, popsize, mutation_rate, crossover_rate, iterations):
-        self.crossover_rate = crossover_rate
-        self.mutation_rate = mutation_rate
-        self.size_of_population = popsize
-        self.current_iteration = 0
-        self.max_iterations = iterations
-        self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
-        
-
     def init_population(self, popsize):
-        for i in range(0, popsize):     
+        for _1 in range(0, popsize):     
             self.population.append(WalkingNetwork.createRandomNetwork())
+            
+    def checkParameters(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
+        if popsize < 3:
+            print("Paramcheck: Population size needs to be at least 2")
+        if 0 <= mutation_rate <= 100:
+            print("Paramcheck: Mutation rate needs to be between 0 and 100")
+        if 0 <= crossover_rate <= 100:
+            print("Paramcheck: Crossover rate needs to be between 0 and 100") 
+        if iterations < 1:
+            print("Paramcheck: iterations need to be positive")
+        if not((-1 < motor_number_flag) and (motor_number_flag < 3)):
+            print("Paramcheck: Wrong motor number flag, only 0,1,2 allowed")
 
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
+        self.checkParameters()
         self.population = []
+        self.max_iterations = iterations
         
-        self.init_GA(popsize, mutation_rate, crossover_rate, iterations)
+        self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
         
-        self.initSimulation(motor_number_flag)
-        
-        self.motor_number_flag = motor_number_flag
+        self.robot_control = RobotControl(motor_number_flag)
 
         self.init_population(popsize)
         
         self.fitness_function = FitnessFunction()
 
     def obtainFitness(self, network):
-        fitness = 0
-
         print('start simulation')
         self.robot_control.startSimulation()
         #print('start moving')
         self.walkInSimulator()
         
-        position_robot, position_ref, position_robot_foot_r, position_robot_foot_l = self.robot_control.getEvalData()
+        pos_robot, pos_ref, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
 
-        fitness = self.fitness_function.getFitness(network, position_robot, position_ref, position_robot_foot_r, position_robot_foot_l)
+        fitness = self.fitness_function.getFitness(network, pos_robot, pos_ref, pos_robot_foot_r, pos_robot_foot_l)
 
         #how fast did the robot move
         #distance / time_needed
@@ -59,10 +56,8 @@ class Coordinator:
 
         return fitness
 
-        #walks in Simulator in scene XY
-        # todo implement better stopvalue
+    # todo implement better stopvalue
     def walkInSimulator(self, network):
-        #while self.shouldwalk:
         while True:
             motor_values = network.computeOneStepOnNw()
             self.robot_control.walkRobot(motor_values)
@@ -70,43 +65,37 @@ class Coordinator:
 
     def getFitnessAveragedOverXTimes(self, network, times):
         fitness = 0
-        for x in range(0, times):
+        for _1 in range(0, times):
             fitness += self.obtainFitness(network)
             network.resetNetwork()
-        
-        fitness /= 3
-        return fitness
+        return fitness / 3
 
-    def getRankedNetworks(self):
-        bestNetworks = []
+    def getRankedNetworks(self): # get top5NWWithFitness
         fitnessList = []
 
-        for network in self.population:
-            fitness = self.getFitnessAveragedOverXTimes(network, 3)
-            fitnessList.append(fitness)
+        for index in range(0, len(self.population)):
+            fitness = self.getFitnessAveragedOverXTimes(self.population[index], 3)
+            fitnessList.append([self.population[index], fitness])
+        
+        fitnessList.sort(key=lambda x: x[1], reverse=True)
+        
+        
+        meanFitness = map(lambda x:sum(x)/float(len(x)), zip(*fitnessList))[1]
 
-        indices = np.flipud(np.argsort(np.array(fitnessList)))
-        meanfitness = np.mean(fitnessList)
+        self.safeMeanAndTop5Fitnesses(meanFitness, [row[1] for row in fitnessList][:5])
 
-        for index in indices:
-            bestNetworks.append(self.population[index])
-
-        self.safeFitness(meanfitness, bestFitness)
-
-        np.array(sortby(x.axis,1))
-        return bestNetworks
+        return [row[0] for row in fitnessList]
 
 
-    def safeFitness(self, meanfitness, best5Fitness):
-        SafeData.safeFitness(meanfitness, best5Fitness)
+    def safeMeanAndTop5Fitnesses(self, meanfitness, best5Fitnesses):
+        SafeData.safeMeanAndTop5Fitnesses(meanfitness, best5Fitnesses)
 
     def safeNetwork(self, network):
         SafeData.safeNetwork(network)
 
     def evolve(self):
-        while self.current_iteration < self.max_iterations:
+        for curr_it in range(0, self.max_iterations):
             rankedNetworks = self.getRankedNetworks()
             self.pop_generator.createNextGeneration(rankedNetworks)
-            self.current_iteration += 1
             self.safeNetwork(rankedNetworks[0])
-            print(self.current_iteration)
+            print("Current iteration:" + curr_it)

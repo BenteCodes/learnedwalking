@@ -1,49 +1,48 @@
 import vrep
 from nicomotion import Motion
+import time
 
 
 class RobotControl:
     robot_string = "../json/nico_humanoid_full_with_grippers_unchecked.json"
     
-    def __init__(self, robot, clientID, more_motors):
+    def __init__(self, more_motors):
         self.more_motors = more_motors 
-        self.robot = Motion.Motion(robot_string, vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
-        vrep.simxFinish(-1)
+        self.robot = Motion.Motion(self.robot_string, vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
+        vrep.simxFinish(-1) # TODO explain why this is here
         self.clientID = vrep.simxStart('127.0.0.1', 19996, True, True, 5000, 5)
       
-
-        
-    def stopSimulation(self):
-        return vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
-
-
     def startSimulation(self):
         time.sleep(0.5)
         vrep.simxStartSimulation(self.clientID, vrep.simx_opmode_oneshot)
-        time.sleep(0.5)    
+        time.sleep(0.5)   
+        
+    def stopSimulation(self):
+        return vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
+  
 
     def robotFell(self, position_robot):
         return position_robot[2] < 0.2
 
     def walkRobot(self, motor_values):
-        for i in range(0,400):
+        for _i in range(0,400):
             self.controlMotors(motor_values)
             torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
-            [m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
+            [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
             if self.robotFell(position_robot):
                 break
 
     def controlMotors(self, motor_values):
         if self.more_motors > 0:
-            full_legs = true
-	    self.setRightLeg(motor_values, full_legs)
-	    self.setLeftLeg(motor_values, full_legs)
-	        
-	    if self.more_motors > 1:
-	        self.setRightArm(motor_values)
-	        self.setLeftArm(motor_values)
-	
-	    time.sleep(0.01)
+            full_legs = True
+        self.setLeftLeg(motor_values, full_legs)
+        self.setRightLeg(motor_values, full_legs)
+
+        if self.more_motors > 1:
+            self.setRightArm(motor_values)
+            self.setLeftArm(motor_values)
+         
+        time.sleep(0.01)
  
  
     def setRightArm(self, motorValues):
@@ -93,11 +92,12 @@ class RobotControl:
       
     def getEvalData(self):
         cube_handle = vrep.simxGetObjectHandle(self.clientID, "reference_cube", vrep.simx_opmode_oneshot_wait)
-        [m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_ref)
+        [_m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_ref)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "right_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
-        [m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
+        [_m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "left_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
-        [m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_robot_foot)
+        [_m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_robot_foot)
         torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
+        [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
         return position_robot, position_ref, position_robot_foot_r, position_robot_foot_l        
     
