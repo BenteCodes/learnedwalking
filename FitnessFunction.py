@@ -22,13 +22,16 @@ class FitnessFunction:
 
 
     def penalizeNonMovement(self, network):
-        if network.highest_angle == 0: #if there is 0 movement
+        if not network.getMovement(): #if there is 0 movement
             return -2000
         return 0
 
 
-    def calcDistanceMoved(self, position_ref, position_robot_foot_r, position_robot_foot_l):
-        distance_r = math.sqrt((math.pow((position_ref[0] - position_robot_foot_r[0]), 2)) + (math.pow((position_ref[1] - position_robot_foot_r[1]), 2)) + (math.pow((position_ref[2] - position_robot_foot_r[2]), 2)))
-        distance_l = math.sqrt((math.pow((position_ref[0] - position_robot_foot_l[0]), 2)) + (math.pow((position_ref[1] - position_robot_foot_l[1]), 2)) + (math.pow((position_ref[2] - position_robot_foot_l[2]), 2)))
-        return (distance_l + distance_r) / 2
+    def calcDistanceMoved(self, pos_start, pos_foot_r, pos_foot_l):
+        distance_right_foot = self.calcEuclideanDistance(pos_start, pos_foot_r)
+        distance_left_foot = self.calcEuclideanDistance(pos_start, pos_foot_l)
+        return (distance_right_foot + distance_left_foot) / 2
+    
+    def calcEuclideanDistance(self, point1, point2):
+        return math.sqrt((math.pow((point1[0] - point2[0]), 2)) + (math.pow((point1[1] - point2[1]), 2)))
     

@@ -31,6 +31,7 @@ class Coordinator:
         self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
         
         self.robot_control = RobotControl(motor_number_flag)
+        #self.robot_control = DummyRobotControl()
 
         self.init_population(popsize)
         
@@ -42,9 +43,9 @@ class Coordinator:
         #print('start moving')
         self.walkInSimulator()
         
-        pos_robot, pos_ref, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
+        pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
 
-        fitness = self.fitness_function.getFitness(network, pos_robot, pos_ref, pos_robot_foot_r, pos_robot_foot_l)
+        fitness = self.fitness_function.getFitness(network, pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l)
 
         #how fast did the robot move
         #distance / time_needed
