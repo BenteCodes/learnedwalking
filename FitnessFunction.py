@@ -14,7 +14,7 @@ class FitnessFunction:
         fitness += self.calcDistanceMoved(position_ref, position_robot_foot_r, position_robot_foot_l)
         return fitness
         
-    
+           
     def penalizeFalling(self, position_robot):
         if position_robot[2] < 0.4: # robotFellDownThreshold
             return -100 #relly don't fall
@@ -31,6 +31,7 @@ class FitnessFunction:
         distance_right_foot = self.calcEuclideanDistance(pos_start, pos_foot_r)
         distance_left_foot = self.calcEuclideanDistance(pos_start, pos_foot_l)
         return (distance_right_foot + distance_left_foot) / 2
+    
     
     def calcEuclideanDistance(self, point1, point2):
         return math.sqrt((math.pow((point1[0] - point2[0]), 2)) + (math.pow((point1[1] - point2[1]), 2)))
