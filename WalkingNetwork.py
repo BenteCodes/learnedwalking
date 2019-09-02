@@ -87,11 +87,11 @@ class WalkingNetwork:
         #print(state_output)
         self.last_state_hidden = state_hidden
 
-        self.wasThereMovement = self.wasThereMovement(state_output)
+        self.areThereNonZeroOutputs = self.areThereNonZeroOutputs(state_output)
         
         return state_output
 
-    def wasThereMovement(self, state_output):
+    def areThereNonZeroOutputs(self, state_output):
         return abs(max(state_output, key=abs)) > 0.05
 
     def resetHiddenLayer(self):
@@ -104,7 +104,7 @@ class WalkingNetwork:
         return self.weight[index]
     
     def getMovement(self):
-        return self.wasThereMovement
+        return self.areThereNonZeroOutputs
     
     @staticmethod
     def createRandomNetwork(self):

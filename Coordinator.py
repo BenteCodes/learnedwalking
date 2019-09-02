@@ -7,6 +7,7 @@ import SafeData
 
 class Coordinator:
 
+    number_of_steps_in_simulator = 400
     def init_population(self, popsize):
         for _1 in range(0, popsize):     
             self.population.append(WalkingNetwork.createRandomNetwork())
@@ -41,11 +42,11 @@ class Coordinator:
         print('start simulation')
         self.robot_control.startSimulation()
         #print('start moving')
-        self.walkInSimulator()
+        self.walkInSimulator(network)
         
-        pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
+        robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
 
-        fitness = self.fitness_function.getFitness(network.getMovement(), pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l)
+        fitness = self.fitness_function.getFitness(network.areThereNonZeroOutputs(), robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
 
         #how fast did the robot move
         #distance / time_needed
@@ -59,9 +60,10 @@ class Coordinator:
 
     # todo implement better stopvalue
     def walkInSimulator(self, network):
-        while True:
-            motor_values = network.computeOneStepOnNw()
-            self.robot_control.walkRobot(motor_values)
+        for _i in range(0, self.number_of_steps_in_simulator):
+            self.robot_control.walkRobot(network.computeOneStepOnNw())
+            if(self.robot_control.robotFell()):
+                break
         
 
     def getFitnessAveragedOverXTimes(self, network, times):

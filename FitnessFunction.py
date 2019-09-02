@@ -5,25 +5,25 @@ class FitnessFunction:
     def __init__(self):
         pass
 
-    def getFitness(self, did_move, position_robot, position_ref, position_robot_foot_r, position_robot_foot_l):
+    def getFitness(self, did_move, did_fall, position_ref, position_robot_foot_r, position_robot_foot_l):
         fitness = 0
         fitness += self.penalizeNonMovement(did_move)
 
-        fitness += self.penalizeFalling(position_robot)
+        fitness += self.penalizeFalling(did_fall)
 
         fitness += self.calcDistanceMoved(position_ref, position_robot_foot_r, position_robot_foot_l)
         return fitness
         
            
-    def penalizeFalling(self, position_robot):
-        if position_robot[2] < 0.4: # robotFellDownThreshold
+    def penalizeFalling(self, did_fall):
+        if did_fall:
             return -100 #really don't fall
         return 0
 
 
     def penalizeNonMovement(self, did_move):
         if not did_move:
-            return -2000
+            return -2000 # really, really move
         return 0
 
 
