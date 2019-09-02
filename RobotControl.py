@@ -1,10 +1,12 @@
 import vrep
 from nicomotion import Motion
 import time
+from RobotControlAbstract import RobotControlAbstract 
 
 
-class RobotControl:
+class RobotControl(RobotControlAbstract):
     robot_string = "../json/nico_humanoid_full_with_grippers_unchecked.json"
+    
     
     def __init__(self, more_motors):
         self.more_motors = more_motors 
@@ -21,16 +23,13 @@ class RobotControl:
         return vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
   
 
-    def robotFell(self, position_robot):
+    def robotFell(self):
+        torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
+        [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
         return position_robot[2] < 0.2
 
     def walkRobot(self, motor_values):
-        for _i in range(0,400):
-            self.controlMotors(motor_values)
-            torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
-            [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
-            if self.robotFell(position_robot):
-                break
+        self.controlMotors(motor_values)
 
     def controlMotors(self, motor_values):
         if self.more_motors > 0:
@@ -97,7 +96,5 @@ class RobotControl:
         [_m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "left_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
         [_m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_robot_foot)
-        torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
-        [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
-        return position_robot, position_ref, position_robot_foot_r, position_robot_foot_l        
+        return self.robotFell(), position_ref, position_robot_foot_r, position_robot_foot_l      
     
