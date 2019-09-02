@@ -2,7 +2,6 @@
 import numpy as np
 from scipy.stats import logistic
 import random
-#from nicomotion import Motion
 from SimplePatternGenerator import SimplePatternGenerator
 
 # class for that network
@@ -93,7 +92,7 @@ class WalkingNetwork:
         return state_output
 
     def wasThereMovement(self, state_output):
-         return abs(max(state_output, key=abs)) > 0.05
+        return abs(max(state_output, key=abs)) > 0.05
 
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, 4))
