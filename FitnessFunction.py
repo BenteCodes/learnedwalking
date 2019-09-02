@@ -5,9 +5,9 @@ class FitnessFunction:
     def __init__(self):
         pass
 
-    def getFitness(self, network, position_robot, position_ref, position_robot_foot_r, position_robot_foot_l):
+    def getFitness(self, did_move, position_robot, position_ref, position_robot_foot_r, position_robot_foot_l):
         fitness = 0
-        fitness += self.penalizeNonMovement(network)
+        fitness += self.penalizeNonMovement(did_move)
 
         fitness += self.penalizeFalling(position_robot)
 
@@ -17,12 +17,12 @@ class FitnessFunction:
            
     def penalizeFalling(self, position_robot):
         if position_robot[2] < 0.4: # robotFellDownThreshold
-            return -100 #relly don't fall
+            return -100 #really don't fall
         return 0
 
 
-    def penalizeNonMovement(self, network):
-        if not network.getMovement(): #if there is 0 movement
+    def penalizeNonMovement(self, did_move):
+        if not did_move:
             return -2000
         return 0
 

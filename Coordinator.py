@@ -45,7 +45,7 @@ class Coordinator:
         
         pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
 
-        fitness = self.fitness_function.getFitness(network, pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l)
+        fitness = self.fitness_function.getFitness(network.getMovement(), pos_robot, point1, pos_robot_foot_r, pos_robot_foot_l)
 
         #how fast did the robot move
         #distance / time_needed
