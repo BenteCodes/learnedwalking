@@ -1,6 +1,6 @@
 from WalkingNetwork import WalkingNetwork
-import PopulationGenerator
-import FitnessFunction
+from PopulationGenerator import PopulationGenerator
+from FitnessFunction import FitnessFunction
 from Tests.RobotControlDummy import RobotControlDummy
 import SafeData
 
@@ -26,7 +26,7 @@ class Coordinator:
             print("Paramcheck: Wrong motor number flag, only 0,1,2 allowed")
 
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
-        self.checkParameters()
+        self.checkParameters(popsize, mutation_rate, crossover_rate, iterations, motor_number_flag)
         self.population = []
         self.max_iterations = iterations
         

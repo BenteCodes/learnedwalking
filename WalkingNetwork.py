@@ -107,9 +107,9 @@ class WalkingNetwork:
         return self.areThereNonZeroOutputs
     
     @staticmethod
-    def createRandomNetwork(self):
+    def createRandomNetwork():
         weights = []
-        for _i in range(0, self.getNumberOfWeights()):
+        for _i in range(0, WalkingNetwork.number_of_weights):
             weights.append(random.uniform(-1, 1))
             
         return WalkingNetwork(weights)
