@@ -7,7 +7,7 @@ from SimplePatternGenerator import SimplePatternGenerator
 
 # class for that network
 # parameters: weights
-class Network(object):
+class Network:
     
     number_of_input_units = 10  # min 4
     number_of_hidden_units = 4
