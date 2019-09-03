@@ -1,13 +1,14 @@
 from WalkingNetwork import WalkingNetwork
-from PopulationGenerator import PopulationGenerator
-from FitnessFunction import FitnessFunction
-from RobotControl import RobotControl
+import PopulationGenerator
+import FitnessFunction
+from Tests.RobotControlDummy import RobotControlDummy
 import SafeData
 
 
 class Coordinator:
 
     number_of_steps_in_simulator = 400
+
     def init_population(self, popsize):
         for _1 in range(0, popsize):     
             self.population.append(WalkingNetwork.createRandomNetwork())
@@ -31,8 +32,8 @@ class Coordinator:
         
         self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
         
-        self.robot_control = RobotControl(motor_number_flag)
-        #self.robot_control = DummyRobotControl()
+        self.robot_control = RobotControlDummy(motor_number_flag)
+        # self.robot_control = DummyRobotControl()
 
         self.init_population(popsize)
         
@@ -41,16 +42,16 @@ class Coordinator:
     def obtainFitness(self, network):
         print('start simulation')
         self.robot_control.startSimulation()
-        #print('start moving')
+        # print('start moving')
         self.walkInSimulator(network)
         
         robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
 
         fitness = self.fitness_function.getFitness(network.areThereNonZeroOutputs(), robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
 
-        #how fast did the robot move
-        #distance / time_needed
-        #fitness += #+velocity bonus
+        # how fast did the robot move
+        # distance / time_needed
+        # fitness += #+velocity bonus
         print('fitness:' + str(fitness))
         
         self.robot_control.stopSimulation()
@@ -64,7 +65,6 @@ class Coordinator:
             self.robot_control.walkRobot(network.computeOneStepOnNw())
             if(self.robot_control.robotFell()):
                 break
-        
 
     def getFitnessAveragedOverXTimes(self, network, times):
         fitness = 0
@@ -73,7 +73,7 @@ class Coordinator:
             network.resetNetwork()
         return fitness / 3
 
-    def getRankedNetworks(self): # get top5NWWithFitness
+    def getRankedNetworks(self):  # get top5NWWithFitness
         fitnessList = []
 
         for index in range(0, len(self.population)):
@@ -82,13 +82,11 @@ class Coordinator:
         
         fitnessList.sort(key=lambda x: x[1], reverse=True)
         
-        
-        meanFitness = map(lambda x:sum(x)/float(len(x)), zip(*fitnessList))[1]
+        meanFitness = map(lambda x:sum(x) / float(len(x)), zip(*fitnessList))[1]
 
         self.safeMeanAndTop5Fitnesses(meanFitness, [row[1] for row in fitnessList][:5])
 
         return [row[0] for row in fitnessList]
-
 
     def safeMeanAndTop5Fitnesses(self, meanfitness, best5Fitnesses):
         SafeData.safeMeanAndTop5Fitnesses(meanfitness, best5Fitnesses)

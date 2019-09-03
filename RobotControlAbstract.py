@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class RobotControlAbstract(ABC):
+class RobotControlAbstract():
 
 	@abstractmethod
 	def __init__(self, more_motors):

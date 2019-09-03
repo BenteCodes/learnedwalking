@@ -6,6 +6,8 @@ from RobotControlAbstract import RobotControlAbstract
 
 class RobotControl(RobotControlAbstract):
     robot_string = "../json/nico_humanoid_full_with_grippers_unchecked.json"
+    oneshot = ""  # vrep.simx_opmode_oneshot
+    oneshot_wait = ""  # vrep.simx_opmode_oneshot_wait
     
     def __init__(self, more_motors):
         self.more_motors = more_motors 
@@ -15,15 +17,15 @@ class RobotControl(RobotControlAbstract):
       
     def startSimulation(self):
         time.sleep(0.5)
-        vrep.simxStartSimulation(self.clientID, vrep.simx_opmode_oneshot)
+        vrep.simxStartSimulation(self.clientID, self.oneshot)
         time.sleep(0.5)   
         
     def stopSimulation(self):
-        return vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
+        return vrep.simxStopSimulation(self.clientID, self.oneshot)
 
     def robotFell(self):
-        torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
-        [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, vrep.simx_opmode_oneshot_wait)
+        torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", self.oneshot_wait)
+        [_m, position_robot] = vrep.simxGetObjectPosition(self.clientID, torso_handle[1], -1, self.oneshot_wait)
         return position_robot[2] < 0.2
 
     def walkRobot(self, motor_values):
@@ -84,11 +86,11 @@ class RobotControl(RobotControlAbstract):
             self.setRightLegVertical(motorValues)
       
     def getEvalData(self):
-        cube_handle = vrep.simxGetObjectHandle(self.clientID, "reference_cube", vrep.simx_opmode_oneshot_wait)
-        [_m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait)  # print(position_ref)
-        foot_handle = vrep.simxGetObjectHandle(self.clientID, "right_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
-        [_m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
-        foot_handle = vrep.simxGetObjectHandle(self.clientID, "left_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
-        [_m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)  # print(position_robot_foot)
+        cube_handle = vrep.simxGetObjectHandle(self.clientID, "reference_cube", self.oneshot_wait)
+        [_m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, self.oneshot_wait)  # print(position_ref)
+        foot_handle = vrep.simxGetObjectHandle(self.clientID, "right_foot_11_respondable", self.oneshot_wait)
+        [_m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, self.oneshot_wait)
+        foot_handle = vrep.simxGetObjectHandle(self.clientID, "left_foot_11_respondable", self.oneshot_wait)
+        [_m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, self.oneshot_wait)  # print(position_robot_foot)
         return self.robotFell(), position_ref, position_robot_foot_r, position_robot_foot_l      
     
