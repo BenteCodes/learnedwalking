@@ -1,5 +1,5 @@
 import vrep
-from nicomotion import Motion
+# from nicomotion import Motion
 import time
 from RobotControlAbstract import RobotControlAbstract 
 
@@ -7,11 +7,10 @@ from RobotControlAbstract import RobotControlAbstract
 class RobotControl(RobotControlAbstract):
     robot_string = "../json/nico_humanoid_full_with_grippers_unchecked.json"
     
-    
     def __init__(self, more_motors):
         self.more_motors = more_motors 
-        self.robot = Motion.Motion(self.robot_string, vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
-        vrep.simxFinish(-1) # TODO explain why this is here
+        # self.robot = Motion.Motion(self.robot_string, vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
+        vrep.simxFinish(-1)  # TODO explain why this is here
         self.clientID = vrep.simxStart('127.0.0.1', 19996, True, True, 5000, 5)
       
     def startSimulation(self):
@@ -21,7 +20,6 @@ class RobotControl(RobotControlAbstract):
         
     def stopSimulation(self):
         return vrep.simxStopSimulation(self.clientID, vrep.simx_opmode_oneshot)
-  
 
     def robotFell(self):
         torso_handle = vrep.simxGetObjectHandle(self.clientID, "torso_11_visual", vrep.simx_opmode_oneshot_wait)
@@ -43,20 +41,17 @@ class RobotControl(RobotControlAbstract):
          
         time.sleep(0.01)
  
- 
     def setRightArm(self, motorValues):
-        self.robot.changeAngle("r_shoulder_y",  motorValues[(0, 0)], 1)
-        self.robot.changeAngle("r_shoulder_z",  motorValues[(0, 1)], 1)
-        self.robot.changeAngle("r_arm_x",       motorValues[(0, 2)], 1)
-        self.robot.changeAngle("r_elbow_y",     motorValues[(0, 3)], 1)
-
+        self.robot.changeAngle("r_shoulder_y", motorValues[(0, 0)], 1)
+        self.robot.changeAngle("r_shoulder_z", motorValues[(0, 1)], 1)
+        self.robot.changeAngle("r_arm_x", motorValues[(0, 2)], 1)
+        self.robot.changeAngle("r_elbow_y", motorValues[(0, 3)], 1)
 
     def setLeftArm(self, motorValues):
-        self.robot.changeAngle("l_shoulder_y",  motorValues[(0, 4)], 1)
-        self.robot.changeAngle("l_shoulder_z",  motorValues[(0, 5)], 1)
-        self.robot.changeAngle("l_arm_x",       motorValues[(0, 6)], 1)
-        self.robot.changeAngle("l_elbow_y",     motorValues[(0, 7)], 1)
-      
+        self.robot.changeAngle("l_shoulder_y", motorValues[(0, 4)], 1)
+        self.robot.changeAngle("l_shoulder_z", motorValues[(0, 5)], 1)
+        self.robot.changeAngle("l_arm_x", motorValues[(0, 6)], 1)
+        self.robot.changeAngle("l_elbow_y", motorValues[(0, 7)], 1)
         
     def setLeftLegVertical(self, motorValues):
         self.robot.changeAngle("l_hip_x", motorValues[(0, 14)], 1)
@@ -72,7 +67,6 @@ class RobotControl(RobotControlAbstract):
         self.setLeftLegHorizontal(motorValues)                    
         if all_motors:
             self.setLeftLegVertical(motorValues)
-
 
     def setRightLegVertical(self, motorValues):
         self.robot.changeAngle("r_hip_x", motorValues[(0, 8)], 1)
@@ -91,10 +85,10 @@ class RobotControl(RobotControlAbstract):
       
     def getEvalData(self):
         cube_handle = vrep.simxGetObjectHandle(self.clientID, "reference_cube", vrep.simx_opmode_oneshot_wait)
-        [_m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_ref)
+        [_m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, vrep.simx_opmode_oneshot_wait)  # print(position_ref)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "right_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
         [_m, position_robot_foot_r] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)
         foot_handle = vrep.simxGetObjectHandle(self.clientID, "left_foot_11_respondable", vrep.simx_opmode_oneshot_wait)
-        [_m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait) #print(position_robot_foot)
+        [_m, position_robot_foot_l] = vrep.simxGetObjectPosition(self.clientID, foot_handle[1], -1, vrep.simx_opmode_oneshot_wait)  # print(position_robot_foot)
         return self.robotFell(), position_ref, position_robot_foot_r, position_robot_foot_l      
     
