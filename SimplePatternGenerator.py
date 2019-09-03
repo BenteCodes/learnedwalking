@@ -1,22 +1,28 @@
 import csv
 
+
 class SimplePatternGenerator:
 
-    def __init__(self, pattern_name1, pattern_name2, pattern_name3, pattern_name4):
-        self.pattern1 = self.getpatternfromdata(pattern_name1)
-        self.pattern2 = self.getpatternfromdata(pattern_name2)
-        self.pattern3 = self.getpatternfromdata(pattern_name3)
-        self.pattern4 = self.getpatternfromdata(pattern_name4)
+    path1 = 'csv/sinepattern.csv'
+    path2 = 'csv/plussinepattern.csv'
+    path3 = 'csv/blopppattern.csv'
+    path4 = 'csv/broadsinepattern.csv'
 
-        self.value1 = 0
+    def __init__(self):
+        self.pattern1 = self.getPatternFromPath(self.path1)
+        self.pattern2 = self.getPatternFromPath(self.path2)
+        self.pattern3 = self.getPatternFromPath(self.path3)
+        self.pattern4 = self.getPatternFromPath(self.path4)
+
+        self.value1 = 0 
         self.value2 = 0
         self.value3 = 0
         self.value4 = 0
         self.currentstep = 0
 
-    def getpatternfromdata(self, dataname):
+    def getPatternFromPath(self, path):
         tmparray = []
-        with open(dataname, 'r') as csvfile:
+        with open(path, 'r') as csvfile:
             patternreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
             for row in patternreader:
                 tmparray.append(float(row[1]))
