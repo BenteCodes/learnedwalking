@@ -5,8 +5,8 @@ from math import sqrt
 
 def test_penalizeFalling():
     test_fitnessfunc = FitnessFunction()
-    assert test_fitnessfunc.penalizeFalling([0, 0, 0.2]) == -100, 'falling wrongly penalized'
-    assert test_fitnessfunc.penalizeFalling([0, 0, 0.5]) == 0, 'not falling penalized'
+    assert test_fitnessfunc.penalizeFalling(True) == -100, 'falling wrongly penalized'
+    assert test_fitnessfunc.penalizeFalling(False) == 0, 'not falling penalized'
 
 
 def test_penalizeNonMovement():

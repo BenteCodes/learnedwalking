@@ -1,5 +1,5 @@
 import pytest
-from WalkingNetwork import WalkingNetwork
+from Network import Network
 from Tests.RobotControlDummy import RobotControlDummy
 from Coordinator import Coordinator
 

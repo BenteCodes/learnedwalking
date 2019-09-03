@@ -1,4 +1,4 @@
-import WalkingNetwork
+import Network
 import random
 
 # genetic algorithm to learn basic pattern
@@ -48,7 +48,7 @@ class PopulationGenerator:
                 weight += mutation
             new_weights.append(weight)
             
-        return WalkingNetwork(new_weights)
+        return Network(new_weights)
 
     def crossoverNetwork(self, network1, network2):
         network_size = network1.getNumberOfWeights()
@@ -59,7 +59,7 @@ class PopulationGenerator:
                 new_weights.append(network1.getWeightAt(index))
             else:
                 new_weights.append(network2.getWeightAt(index))
-        return WalkingNetwork(new_weights)
+        return Network(new_weights)
     
     def getRandomIndexBetterPreferred(self, ranked):
         rankSum = sum(range(self.size_of_population + 1))
