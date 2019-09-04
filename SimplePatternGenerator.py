@@ -25,7 +25,7 @@ class SimplePatternGenerator:
 
     def getPatternFromPath(self, path):
         tmparray = []
-        with open(path, 'r') as csvfile:
+        with open(str(path), 'r') as csvfile:
             patternreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
             for row in patternreader:
                 tmparray.append(float(row[1]))

@@ -20,6 +20,7 @@ class Network:
         self.checkParameters(weights)    
         self.initNetwork(weights)
         self.initInputPattern()
+        self.are_there_non_zero_outputs_value = False
     
     def checkParameters(self, weights):
         if not(len(weights) == self.number_of_weights):
@@ -38,6 +39,8 @@ class Network:
         position_start = position_end
         position_end += self.number_of_hidden_units        
         self.hidden_to_hidden = np.matrix(weights[position_start:position_end])
+        
+        self.weights_to_hidden_units = self.prepareWeightsToHiddenUnits()
 
         position_start = position_end
         position_end += (self.number_of_hidden_units * self.number_of_output_units)         
@@ -46,6 +49,17 @@ class Network:
     
     def initInputPattern(self):
         self.simple_pattern = SimplePatternGenerator()    
+    
+    '''
+    Combines the weights from the input layer to the hidden layer and the recurrent weights of the hidden layer
+    into one matrix.
+    Only needed once per network
+    ''' 
+
+    def prepareWeightsToHiddenUnits(self):
+        weights_to_hidden_units = np.concatenate((self.input_to_hidden_all, self.hidden_to_hidden), axis=0)
+        weights_to_hidden_units = np.transpose(weights_to_hidden_units)
+        return weights_to_hidden_units
     
     # need to be a 10x1 matrix for matrix purposes, though only 5 get used
     def getInput(self):
@@ -65,31 +79,57 @@ class Network:
 
     # forewardpropagation
     # input is a np matrix [10x1]
-    def computeOneStep(self):
-        state_input = self.getInput()
+
+    '''
+    Creates one inputvector for every hidden neuron and saves them into a 
+    number_of_input_units X number_of_hidden_units matrix
+    '''
+
+    def duplicateInputByNumberOfHiddenUnits(self, state_input):
         hidden = self.number_of_hidden_units
+        input_matrix = state_input
         while hidden > 1:
-            state_input = np.concatenate((state_input, self.input_matrix), axis=1)
+            state_input = np.concatenate((state_input, input_matrix), axis=1)
             hidden -= 1
+        return state_input
 
+    '''
+    Adds the previous output of the hidden units to the input vectors in the matrix
+    '''
+
+    def addRecurrentInputs(self, state_input):
         assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
-        # done until here
-        assembled_hidden_weights = self.input_to_hidden_all
-        assembled_hidden_weights = np.insert(assembled_hidden_weights, [self.number_of_input_units], np.transpose(self.hidden_to_hidden), axis=1)
-        state_hidden = (logistic.cdf(np.matrix([np.diagonal(assembled_hidden_weights * assembled_hidden_input, 0)])) + 2) - 1  # TODO check this please, wtf + names!!
+        return assembled_hidden_input
 
-        # print(state_hidden)
-        state_output = (logistic.cdf(state_hidden * self.hidden_to_output_all) * 2) - 1
-        # print(state_output)
-        self.last_state_hidden = state_hidden
+    '''
+    Fetches all input values and creates the matrix for the multiplication
+    '''
 
-        self.areThereNonZeroOutputs = self.areThereNonZeroOutputs(state_output)
+    def createInputValueMatrix(self):
+        oneD_input_vector = self.getInput()
+        number_of_input_units_times_number_of_hidden_units_matrix = self.duplicateInputByNumberOfHiddenUnits(oneD_input_vector)
+        values_into_hidden_units = self.addRecurrentInputs(number_of_input_units_times_number_of_hidden_units_matrix)
+        return values_into_hidden_units
+
+    def computeOneStep(self):
+        values_into_hidden_units = self.createInputValueMatrix()
         
+        # Actual computation of the output of the hidden layer
+        # returns a number_of_hidden_units vector and saves it
+        state_hidden = (logistic.cdf(np.matrix([np.diagonal(self.weights_to_hidden_units * values_into_hidden_units, 0)])) + 2) - 1  # TODO check this please, wtf + names!!
+        self.last_state_hidden = state_hidden
+        
+        # Actual computation of the output of the network
+        # returns a number_of_output_units vector
+        state_output = (logistic.cdf(state_hidden * self.hidden_to_output_all) * 2) - 1
+
+        self.areThereNonZeroOutputs(list(state_output))
         return state_output
 
     def areThereNonZeroOutputs(self, state_output):
-        return abs(max(state_output, key=abs)) > 0.05
-
+        are_there_non_zero_outputs_array = abs(max(state_output, key=abs)) > 0.05
+        self.are_there_non_zero_outputs_value = are_there_non_zero_outputs_array
+    
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, 4))
     
@@ -100,7 +140,7 @@ class Network:
         return self.weight[index]
     
     def getMovement(self):
-        return self.areThereNonZeroOutputs
+        return self.are_there_non_zero_outputs_value
     
     @staticmethod
     def generateRandomWeights():
@@ -109,3 +149,4 @@ class Network:
             weights.append(random.uniform(-1, 1))
             
         return weights
+
