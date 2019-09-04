@@ -46,8 +46,8 @@ class Coordinator:
         self.walkInSimulator(network)
         
         robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
-
-        fitness = self.fitness_function.getFitness(network.areThereNonZeroOutputs(), robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
+        print(network.are_there_non_zero_outputs_value)
+        fitness = self.fitness_function.getFitness(network.are_there_non_zero_outputs_value, robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
 
         # how fast did the robot move
         # distance / time_needed
@@ -70,7 +70,7 @@ class Coordinator:
         fitness = 0
         for _1 in range(0, times):
             fitness += self.obtainFitness(network)
-            network.resetNetwork()
+            network.resetHiddenLayer()
         return fitness / 3
 
     def getRankedNetworks(self):  # get top5NWWithFitness

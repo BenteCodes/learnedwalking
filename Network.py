@@ -128,7 +128,7 @@ class Network:
 
     def areThereNonZeroOutputs(self, state_output):
         are_there_non_zero_outputs_array = abs(max(state_output, key=abs)) > 0.05
-        self.are_there_non_zero_outputs_value = are_there_non_zero_outputs_array
+        self.are_there_non_zero_outputs_value = (True in are_there_non_zero_outputs_array) == True
     
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, 4))

@@ -21,5 +21,5 @@ class RobotControlDummy(RobotControlAbstract):
         pass
       
     def getEvalData(self):
-        return self.robotFell(), 0, self.motor_values[5], self.motor_values[10]        
+        return self.robotFell(), [0, 0], [0, self.motor_values[0][5]], [0, self.motor_values[0][10]]        
     

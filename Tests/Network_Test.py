@@ -5,6 +5,7 @@ Created on Sep 2, 2019
 '''
 import pytest
 from Network import Network
+import numpy as np
 
 
 def test_generateRandomWeights():
@@ -32,9 +33,9 @@ def test_areThereNonZeroOutputs():
     weights = Network.generateRandomWeights()
     nw = Network(weights)
     assert nw.are_there_non_zero_outputs_value == False, 'are_there_non_zero_outputs_value wrongly set at the start'
-    nw.areThereNonZeroOutputs([0, 0, 0, 0])
+    nw.areThereNonZeroOutputs(np.array([[0, 0, 0, 0]]))
     assert nw.are_there_non_zero_outputs_value == False, 'ZeroMovement not recognized'
-    nw.areThereNonZeroOutputs([-1, 1, 5, 9])
+    nw.areThereNonZeroOutputs(np.array([[-1, 1, 0, 0]]))
     assert nw.are_there_non_zero_outputs_value == True, 'Non-zero-movement not found'
 
 
