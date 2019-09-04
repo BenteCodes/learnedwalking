@@ -32,9 +32,9 @@ def test_areThereNonZeroOutputs():
     weights = Network.generateRandomWeights()
     nw = Network(weights)
     assert nw.are_there_non_zero_outputs_value == False, 'are_there_non_zero_outputs_value wrongly set at the start'
-    nw.areThereNonZeroOutputs([0, 0, 0, 0])
+    nw.areThereNonZeroOutput([0, 0, 0, 0])
     assert nw.are_there_non_zero_outputs_value == False, 'ZeroMovement not recognized'
-    nw.areThereNonZeroOutputs([-1, 1, 5, 9])
+    nw.areThereNonZeroOutput([-1, 1, 5, 9])
     assert nw.are_there_non_zero_outputs_value == True, 'Non-zero-movement not found'
 
 

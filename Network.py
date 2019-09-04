@@ -105,30 +105,28 @@ class Network:
     Fetches all input values and creates the matrix for the multiplication
     '''
 
-    def createInputValueMatrix(self):
+    def createHiddenLayerInput(self):
         oneD_input_vector = self.getInput()
         number_of_input_units_times_number_of_hidden_units_matrix = self.duplicateInputByNumberOfHiddenUnits(oneD_input_vector)
         values_into_hidden_units = self.addRecurrentInputs(number_of_input_units_times_number_of_hidden_units_matrix)
         return values_into_hidden_units
 
     def computeOneStep(self):
-        values_into_hidden_units = self.createInputValueMatrix()
+        hidden_layer_input = self.createHiddenLayerInput()
         
         # Actual computation of the output of the hidden layer
         # returns a number_of_hidden_units vector and saves it
-        state_hidden = (logistic.cdf(np.matrix([np.diagonal(self.weights_to_hidden_units * values_into_hidden_units, 0)])) + 2) - 1  # TODO check this please, wtf + names!!
-        self.last_state_hidden = state_hidden
+        self.last_state_hidden = (logistic.cdf(np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])) + 2) - 1  # TODO check this please, wtf + names!!
         
         # Actual computation of the output of the network
         # returns a number_of_output_units vector
-        state_output = (logistic.cdf(state_hidden * self.hidden_to_output_all) * 2) - 1
+        network_output = (logistic.cdf(self.last_state_hidden * self.hidden_to_output_all) * 2) - 1
 
-        self.areThereNonZeroOutputs(list(state_output))
-        return state_output
+        self.areThereNonZeroOutput(list(network_output))
+        return network_output
 
-    def areThereNonZeroOutputs(self, state_output):
-        are_there_non_zero_outputs_array = abs(max(state_output, key=abs)) > 0.05
-        self.are_there_non_zero_outputs_value = are_there_non_zero_outputs_array
+    def areThereNonZeroOutput(self, state_output):
+        self.are_there_non_zero_outputs_value = abs(max(state_output, key=abs)) > 0.05
     
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, 4))
