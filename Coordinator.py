@@ -16,12 +16,12 @@ class Coordinator:
     def checkParameters(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
         if popsize < 3:
             print("Paramcheck: Population size needs to be at least 2")
-        if 0 <= mutation_rate <= 100:
+        if not 0 <= mutation_rate <= 100:
             print("Paramcheck: Mutation rate needs to be between 0 and 100")
-        if 0 <= crossover_rate <= 100:
+        if not 0 <= crossover_rate <= 100:
             print("Paramcheck: Crossover rate needs to be between 0 and 100") 
         if iterations < 1:
-            print("Paramcheck: iterations need to be positive")
+            print("Paramcheck: iterations needs to be positive")
         if not((-1 < motor_number_flag) and (motor_number_flag < 3)):
             print("Paramcheck: Wrong motor number flag, only 0,1,2 allowed")
 
@@ -62,7 +62,7 @@ class Coordinator:
     # todo implement better stopvalue
     def walkInSimulator(self, network):
         for _i in range(0, self.number_of_steps_in_simulator):
-            self.robot_control.walkRobot(network.computeOneStepOnNw())
+            self.robot_control.walkRobot(network.computeOneStep())
             if(self.robot_control.robotFell()):
                 break
 
