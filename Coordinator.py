@@ -46,7 +46,7 @@ class Coordinator:
         self.walkInSimulator(network)
         
         robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
-        print(network.are_there_non_zero_outputs_value)
+
         fitness = self.fitness_function.getFitness(network.are_there_non_zero_outputs_value, robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
 
         # how fast did the robot move
