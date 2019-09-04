@@ -39,6 +39,7 @@ class SimplePatternGenerator:
         self.value2 = self.pattern2[self.currentstep]
         self.value3 = self.pattern3[self.currentstep]
         self.value4 = self.pattern4[self.currentstep]
+        return [self.value1, self.value2, self.value3, self.value4]
 
     def getNumberOfPatterns(self):
         return 4

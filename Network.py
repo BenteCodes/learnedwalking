@@ -56,10 +56,10 @@ class Network:
         return input_matrix
     
     def getInputFromSimplePattern(self, input_matrix, np):
-        self.simple_pattern.nextStep()
+        results = self.simple_pattern.nextStep()
         
         for index in range(self.simple_pattern.getNumberOfPatterns()):
-            np.put(input_matrix, index, self.simple_pattern[index])
+            np.put(input_matrix, index, results[index])
         
         return input_matrix
 
