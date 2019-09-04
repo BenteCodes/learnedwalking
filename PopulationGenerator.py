@@ -1,10 +1,12 @@
-import Network
+from Network import Network
 import random
+
 
 # genetic algorithm to learn basic pattern
 class PopulationGenerator:
 
     max_weight_change = 1
+    number_of_kept_best_networks = 2
 
     def __init__(self, size_of_population, mutation_rate, crossover_rate):
         self.size_of_population = size_of_population
@@ -19,28 +21,31 @@ class PopulationGenerator:
             self.createMutantNetwork(child_network)
         return child_network
 
-    def createNextGeneration(self, networks_sorted_by_fitness):
+    def createNextGeneration(self, old_networks_sorted_by_fitness):
         print('Next Generation')
-        population = []
-        population.append(networks_sorted_by_fitness[0].resetHiddenLayer())
-        population.append(networks_sorted_by_fitness[1].resetHiddenLayer())
-
-        while len(population) < self.size_of_population:
+        new_population = []
+        
+        for i in range(0, self.number_of_kept_best_networks):
+            old_networks_sorted_by_fitness[i].resetHiddenLayer()
+            new_population.append(old_networks_sorted_by_fitness[i])
+        
+        while len(new_population) < self.size_of_population:
             probability = random.randint(0, 100)
-            #crossover with 5050 mutation
+            # crossover with 5050 mutation
             if probability <= self.crossover_rate:
-                child_network = self.crossoverNetwork(self.getRandomIndexBetterPreferred(networks_sorted_by_fitness), self.getRandomIndexBetterPreferred(networks_sorted_by_fitness))
+                child_network = self.crossoverNetwork(self.getRandomIndexBetterPreferred(old_networks_sorted_by_fitness), self.getRandomIndexBetterPreferred(old_networks_sorted_by_fitness))
                 child_network = self.mutate5050(child_network)
             else:
-                #only mutation
-                child_network = self.createMutantNetwork(self.getRandomIndexBetterPreferred(networks_sorted_by_fitness))
+                # only mutation
+                child_network = self.createMutantNetwork(self.getRandomIndexBetterPreferred(old_networks_sorted_by_fitness))
             
-            population.append(child_network)
-                
+            new_population.append(child_network)
+        
+        return new_population
 
     def createMutantNetwork(self, network):
         new_weights = []
-        for index in range(0, network.getSize()):
+        for index in range(0, network.getNumberOfWeights()):
             # probability to mutate into weightmutation
             weight = network.getWeightAt(index)
             if random.randint(0, 100) <= self.mutation_rate:
@@ -52,7 +57,7 @@ class PopulationGenerator:
 
     def crossoverNetwork(self, network1, network2):
         network_size = network1.getNumberOfWeights()
-        crossover_point = random.randint(0, network_size-1)
+        crossover_point = random.randint(0, network_size - 1)
         new_weights = []
         for index in range(0, network_size):
             if index <= crossover_point:
@@ -72,4 +77,11 @@ class PopulationGenerator:
             if curIndex >= pickedIndex:
                 return ranked[i]
             diminishingWorth -= 1
+            
+    def initPopulation(self):
+        population = []
+        for _1 in range(0, self.size_of_population):     
+            population.append(Network(Network.generateRandomWeights()))
+        
+        return population
         

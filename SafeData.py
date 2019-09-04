@@ -1,16 +1,25 @@
 import csv
+from pathlib import Path
 
     
-def safeMeanAndTop5Fitnesses(self, meanfitness, best5Fitnesses):
-    with open('output/fitness.csv', 'a') as csvfile1:
+def safeMeanAndTop5Fitnesses(mean_fitness, best_5_fitnesses):
+    path = (getBasePath() / 'fitness.csv').resolve()
+    with open(str(path), 'a') as csvfile1:
         errorwriter = csv.writer(csvfile1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
-        errorwriter.writerow([str(self.current_iteration), str(meanfitness), str(best5Fitnesses[0]), str(best5Fitnesses[1]), str(best5Fitnesses[2]), str(best5Fitnesses[3]), str(best5Fitnesses[4])])
+        errorwriter.writerow([str(mean_fitness), str(best_5_fitnesses[0]), str(best_5_fitnesses[1]), str(best_5_fitnesses[2]), str(best_5_fitnesses[3]), str(best_5_fitnesses[4])])
 
 
-def safeNetwork(self, network):
-    with open('output/network.csv', 'wb') as csvfile:
+def safeNetwork(best_network):
+    path = (getBasePath() / 'best_network.csv').resolve()
+    with open(str(path), 'w+') as csvfile:
         weightwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         weightstring = []
-        for weight in network.weights:weightstring.append(str(weight) + ',')
+        for weight in best_network.weights:weightstring.append(str(weight) + ',')
         weightwriter.writerow(weightstring)
+
+
+def getBasePath():
+    base_path = Path(__file__).parent
+    base_path = (base_path / 'output/').resolve()
+    return base_path

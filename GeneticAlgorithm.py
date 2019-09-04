@@ -3,19 +3,19 @@ from PopulationGenerator import PopulationGenerator
 from FitnessFunction import FitnessFunction
 from Tests.RobotControlDummy import RobotControlDummy
 import SafeData
+import numpy as np
 
 
-class Coordinator:
+class GeneticAlgorithm:
 
     number_of_steps_in_simulator = 400
 
-    def init_population(self, popsize):
-        for _1 in range(0, popsize):     
-            self.population.append(Network(Network.generateRandomWeights()))
+    def init_population(self):
+        self.population = self.pop_generator.initPopulation()
             
     def checkParameters(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
-        if popsize < 3:
-            print("Paramcheck: Population size needs to be at least 2")
+        if popsize < 5:
+            print("Paramcheck: Population size needs to be at least 5")
         if not 0 <= mutation_rate <= 100:
             print("Paramcheck: Mutation rate needs to be between 0 and 100")
         if not 0 <= crossover_rate <= 100:
@@ -27,20 +27,19 @@ class Coordinator:
 
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
         self.checkParameters(popsize, mutation_rate, crossover_rate, iterations, motor_number_flag)
-        self.population = []
-        self.max_iterations = iterations
         
-        self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
+        self.max_iterations = iterations
         
         self.robot_control = RobotControlDummy(motor_number_flag)
         # self.robot_control = DummyRobotControl()
-
-        self.init_population(popsize)
+        
+        self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
+        self.init_population()
         
         self.fitness_function = FitnessFunction()
 
-    def obtainFitness(self, network):
-        print('start simulation')
+    def simulateFitnessOfNetwork(self, network):
+        # print('start simulation')
         self.robot_control.startSimulation()
         # print('start moving')
         self.walkInSimulator(network)
@@ -52,15 +51,17 @@ class Coordinator:
         # how fast did the robot move
         # distance / time_needed
         # fitness += #+velocity bonus
-        print('fitness:' + str(fitness))
+        # print('fitness:' + str(fitness))
         
         self.robot_control.stopSimulation()
-        print('stopped simulation')
+        # print('stopped simulation')
 
         return fitness
 
     # todo implement better stopvalue
     def walkInSimulator(self, network):
+        if network is None:
+            print('None found')
         for _i in range(0, self.number_of_steps_in_simulator):
             self.robot_control.walkRobot(network.computeOneStep())
             if(self.robot_control.robotFell()):
@@ -69,34 +70,41 @@ class Coordinator:
     def getFitnessAveragedOverXTimes(self, network, times):
         fitness = 0
         for _1 in range(0, times):
-            fitness += self.obtainFitness(network)
+            fitness += self.simulateFitnessOfNetwork(network)
             network.resetHiddenLayer()
         return fitness / 3
 
     def getRankedNetworks(self):  # get top5NWWithFitness
         fitnessList = []
 
-        for index in range(0, len(self.population)):
+        # create a list of networks their fitness
+        for index in range(0, len(self.population)):  
             fitness = self.getFitnessAveragedOverXTimes(self.population[index], 3)
             fitnessList.append([self.population[index], fitness])
         
+        # sort it after fitnes, biggest firsts
         fitnessList.sort(key=lambda x: x[1], reverse=True)
         
-        meanFitness = map(lambda x:sum(x) / float(len(x)), zip(*fitnessList))[1]
+        # compute mean fitness
+        meanFitness = np.mean([row[1] for row in fitnessList], axis=0)
 
-        self.safeMeanAndTop5Fitnesses(meanFitness, [row[1] for row in fitnessList][:5])
-
+        # safe mean and top 5 fitnesses (no networks)
+        self.safeMeanAndTop5Fitnesses(meanFitness, fitnessList)
+        
+        # return only the ordered networks (best first)
+        
+        print([row[1] for row in fitnessList][:5])
         return [row[0] for row in fitnessList]
 
-    def safeMeanAndTop5Fitnesses(self, meanfitness, best5Fitnesses):
-        SafeData.safeMeanAndTop5Fitnesses(meanfitness, best5Fitnesses)
+    def safeMeanAndTop5Fitnesses(self, mean_fitness, fitnessList):
+        SafeData.safeMeanAndTop5Fitnesses(mean_fitness, [row[1] for row in fitnessList][:5])
 
-    def safeNetwork(self, network):
-        SafeData.safeNetwork(network)
+    def safeNetwork(self, best_network):
+        SafeData.safeNetwork(best_network)
 
     def evolve(self):
         for curr_it in range(0, self.max_iterations):
             rankedNetworks = self.getRankedNetworks()
-            self.pop_generator.createNextGeneration(rankedNetworks)
             self.safeNetwork(rankedNetworks[0])
-            print("Current iteration:" + curr_it)
+            self.population = self.pop_generator.createNextGeneration(rankedNetworks)
+            print("Current iteration:" + str(curr_it + 1))

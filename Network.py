@@ -7,7 +7,7 @@ from SimplePatternGenerator import SimplePatternGenerator
 
 # class for that network
 # parameters: weights
-class Network:
+class Network(object):
     
     number_of_input_units = 10  # min 4
     number_of_hidden_units = 4
@@ -29,7 +29,9 @@ class Network:
     # disects the weights into the corresponding network parts 
     # 10input -> 4 hidden with recurrant -> 20 output   
     def initNetwork(self, weights):
-        self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # last states values need to be known for the algo and are 1 at the first run.
+        self.weights = weights
+        self.last_state_hidden = []
+        self.resetHiddenLayer() 
         
         position_start = 0
         position_end = self.number_of_input_units * self.number_of_hidden_units
@@ -111,16 +113,31 @@ class Network:
         values_into_hidden_units = self.addRecurrentInputs(number_of_input_units_times_number_of_hidden_units_matrix)
         return values_into_hidden_units
 
+    '''
+    Applies the sigmoid function to all values in the matrix.
+    Afterwards streches and offsets the values so we get values between -1 and 1 instead of 0 and 1
+    '''
+
+    def applySigmoidFunctionPlusOffsets(self, matrix):
+        return (logistic.cdf(matrix) * 2) - 1
+
+    '''
+    One run through the network. From input to hidden, hidden to output
+    With recursive neurons and sigmoid function
+    '''
+
     def computeOneStep(self):
         hidden_layer_input = self.createHiddenLayerInput()
         
         # Actual computation of the output of the hidden layer
-        # returns a number_of_hidden_units vector and saves it
-        self.last_state_hidden = (logistic.cdf(np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])) + 2) - 1  # TODO check this please, wtf + names!!
+        # returns a 1 X number_of_hidden_units matrix
+        diagonal_of_matrix_mul = np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])
+        self.last_state_hidden = self.applySigmoidFunctionPlusOffsets(diagonal_of_matrix_mul)  # TODO check this please, wtf + names!!
         
         # Actual computation of the output of the network
-        # returns a number_of_output_units vector
-        network_output = (logistic.cdf(self.last_state_hidden * self.hidden_to_output_all) * 2) - 1
+        # returns a number_of_output_units X 1 matrixs
+        matrix_mul = self.last_state_hidden * self.hidden_to_output_all
+        network_output = self.applySigmoidFunctionPlusOffsets(matrix_mul)
 
         self.areThereNonZeroOutputs(list(network_output))
         return network_output
@@ -130,14 +147,14 @@ class Network:
         self.are_there_non_zero_outputs_value = (True in are_there_non_zero_outputs_array) == True
     
     def resetHiddenLayer(self):
-        self.last_state_hidden = np.ones((1, 4))
+        self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
     
     def getNumberOfWeights(self):
         return self.number_of_weights
     
     def getWeightAt(self, index):
-        return self.weight[index]
-    
+        return self.weights[index]
+
     def getMovement(self):
         return self.are_there_non_zero_outputs_value
     
