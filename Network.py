@@ -13,7 +13,6 @@ class Network:
     number_of_hidden_units = 4
     number_of_output_units = 20
     number_of_weights = (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)
-    number_of_basic_pattern = 4
 
     # @input weights weights of the network
 
@@ -59,7 +58,7 @@ class Network:
     def getInputFromSimplePattern(self, input_matrix, np):
         self.simple_pattern.nextStep()
         
-        for index in range(self.number_of_basic_pattern):
+        for index in range(self.simple_pattern.getNumberOfPatterns()):
             np.put(input_matrix, index, self.simple_pattern[index])
         
         return input_matrix

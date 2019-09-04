@@ -1,12 +1,15 @@
 import csv
+from pathlib import Path
 
 
 class SimplePatternGenerator:
 
-    path1 = 'csv/sinepattern.csv'
-    path2 = 'csv/plussinepattern.csv'
-    path3 = 'csv/blopppattern.csv'
-    path4 = 'csv/broadsinepattern.csv'
+    base_path = Path(__file__).parent
+    base_path = (base_path / 'csv/').resolve()
+    path1 = (base_path / 'sinepattern.csv').resolve()
+    path2 = (base_path / 'plussinepattern.csv').resolve()
+    path3 = (base_path / 'blopppattern.csv').resolve()
+    path4 = (base_path / 'broadsinepattern.csv').resolve()
 
     def __init__(self):
         self.pattern1 = self.getPatternFromPath(self.path1)
@@ -37,3 +40,5 @@ class SimplePatternGenerator:
         self.value3 = self.pattern3[self.currentstep]
         self.value4 = self.pattern4[self.currentstep]
 
+    def getNumberOfPatterns(self):
+        return 4
