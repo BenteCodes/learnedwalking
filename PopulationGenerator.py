@@ -15,11 +15,11 @@ class PopulationGenerator:
                
     # create the next generation
 
-    def mutate5050(self, child_network):
+    def mutate5050(self, network):
         mutate = random.randint(0, 1)
         if mutate == 1:
-            self.createMutantNetwork(child_network)
-        return child_network
+            network = self.createMutantNetwork(network)
+        return network
 
     def createNextGeneration(self, old_networks_sorted_by_fitness):
         print('Next Generation')
