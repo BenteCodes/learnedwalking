@@ -9,6 +9,7 @@ from GeneticAlgorithmAbstract import GeneticAlgorithmAbstract
 class GeneticAlgorithm(GeneticAlgorithmAbstract):
 
     number_of_steps_in_simulator = 400
+    simulator_repetitions = 3
 
     def init_population(self):
         self.population = self.pop_generator.initPopulation()
@@ -79,7 +80,7 @@ class GeneticAlgorithm(GeneticAlgorithmAbstract):
 
         # create a list of networks their fitness
         for index in range(0, len(self.population)):  
-            fitness = self.getFitnessAveragedOverXTimes(self.population[index], 3)
+            fitness = self.getFitnessAveragedOverXTimes(self.population[index], self.simulator_repetitions)
             fitnessList.append([self.population[index], fitness])
         
         # sort it after fitnes, biggest firsts
