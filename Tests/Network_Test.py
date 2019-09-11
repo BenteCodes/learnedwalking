@@ -4,24 +4,24 @@ Created on Sep 2, 2019
 @author: alica
 '''
 import pytest
-from Network import Network
+from WalkingNetwork import WalkingNetwork
 import numpy as np
 
 
 def test_generateRandomWeights():
-    weights = Network.generateRandomWeights()
-    assert len(weights) == Network.number_of_weights, "Incorrect Number of weights"
+    weights = WalkingNetwork.generateRandomWeights()
+    assert len(weights) == WalkingNetwork.number_of_weights, "Incorrect Number of weights"
 
 
 def test_generateRandomNW():
-    weights = Network.generateRandomWeights()
-    nw = Network(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw = WalkingNetwork(weights)
     assert nw is not None
 
 
 def test_initNetwork():
-    weights = Network.generateRandomWeights()
-    nw = Network(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw = WalkingNetwork(weights)
     assert nw is not None
     assert nw.number_of_input_units == 10, 'wrong number of input units'
     assert nw.number_of_hidden_units == 4, 'wrong number of hidden units'
@@ -30,8 +30,8 @@ def test_initNetwork():
 
 
 def test_areThereNonZeroOutputs():
-    weights = Network.generateRandomWeights()
-    nw = Network(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw = WalkingNetwork(weights)
     assert nw.are_there_non_zero_outputs_value == False, 'are_there_non_zero_outputs_value wrongly set at the start'
     nw.areThereNonZeroOutputs(np.array([[0, 0, 0, 0]]))
     assert nw.are_there_non_zero_outputs_value == False, 'ZeroMovement not recognized'

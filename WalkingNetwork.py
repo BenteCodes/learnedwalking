@@ -8,7 +8,7 @@ import random
 
 # class for that network
 # parameters: weights
-class Network(NetworkAbstract):
+class WalkingNetwork(NetworkAbstract):
     
     number_of_input_units = 10  # min 4
     number_of_hidden_units = 4
@@ -162,7 +162,7 @@ class Network(NetworkAbstract):
     @staticmethod
     def generateRandomWeights():
         weights = []
-        for _i in range(0, Network.number_of_weights):
+        for _i in range(0, WalkingNetwork.number_of_weights):
             weights.append(random.uniform(-1, 1))
             
         return weights

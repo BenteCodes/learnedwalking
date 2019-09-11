@@ -1,5 +1,5 @@
 import pytest
-from Network import Network
+from WalkingNetwork import WalkingNetwork
 from Tests.RobotControlDummy import RobotControlDummy
 from GeneticAlgorithm import GeneticAlgorithm
 

@@ -5,13 +5,13 @@ Created on Sep 5, 2019
 '''
 import pytest
 from PopulationGenerator import PopulationGenerator
-from Network import Network
+from WalkingNetwork import WalkingNetwork
 
 
 def test_mutate5050():
     pop_gen = PopulationGenerator(10, 53, 45)
-    weights = Network.generateRandomWeights()
-    nw = Network(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw = WalkingNetwork(weights)
     ten_networks = []
     for _i in range(0, 10):
         ten_networks.append(pop_gen.mutate5050(nw))
@@ -31,7 +31,7 @@ def test_createNextGeneration():
     assert init_population[0] is new_population[0], 'Good networks not kept alive'
     assert init_population[1] is new_population[1], 'Good networks not kept alive'
     for i in range(2, 10):
-        assert init_population[i] is not new_population[i], 'Unchanged Network'
+        assert init_population[i] is not new_population[i], 'Unchanged WalkingNetwork'
     
     changedWeights = False
     for i in range(0, new_population[3].getNumberOfWeights()):
@@ -44,8 +44,8 @@ def test_createNextGeneration():
     
 def test_createMutantNetwork():
     pop_gen = PopulationGenerator(10, 53, 45)
-    weights = Network.generateRandomWeights()
-    nw = Network(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw = WalkingNetwork(weights)
     ten_networks = []
     for _i in range(0, 10):
         ten_networks.append(pop_gen.createMutantNetwork(nw))
@@ -54,10 +54,10 @@ def test_createMutantNetwork():
 
 def test_crossoverNetwork():
     pop_gen = PopulationGenerator(10, 43, 45)
-    weights = Network.generateRandomWeights()
-    nw1 = Network(weights)
-    weights = Network.generateRandomWeights()
-    nw2 = Network(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw1 = WalkingNetwork(weights)
+    weights = WalkingNetwork.generateRandomWeights()
+    nw2 = WalkingNetwork(weights)
     crossover_network = pop_gen.crossoverNetwork(nw1, nw2)
     
     crossedOver = False
@@ -88,6 +88,6 @@ def test_getRandomIndexBetterPreferred():
 def test_initPopulation():
     pop_gen = PopulationGenerator(10, 53, 45)
     init_population = pop_gen.initPopulation()
-    assert init_population[0] is not None, 'Generated Network is None'
+    assert init_population[0] is not None, 'Generated WalkingNetwork is None'
     assert len(init_population) == 10, 'wrong amount of individuals in the init-population'
 

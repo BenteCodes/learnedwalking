@@ -17,3 +17,7 @@ class NetworkAbstract(ABC):
     def computeOneStep(self):
         pass
 
+    @staticmethod
+    def generateRandomWeights():
+        pass
+    # I wowuld like to define this as a default method here, but I am incapable of getting a default variable here

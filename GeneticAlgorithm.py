@@ -1,4 +1,4 @@
-from Network import Network
+from WalkingNetwork import WalkingNetwork
 from PopulationGenerator import PopulationGenerator
 from FitnessFunction import FitnessFunction
 from Tests.RobotControlDummy import RobotControlDummy
