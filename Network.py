@@ -1,13 +1,14 @@
 # Imports und so
 import numpy as np
 from scipy.stats import logistic
-import random
 from SimplePatternGenerator import SimplePatternGenerator
+from NetworkAbstract import NetworkAbstract
+import random
 
 
 # class for that network
 # parameters: weights
-class Network(object):
+class Network(NetworkAbstract):
     
     number_of_input_units = 10  # min 4
     number_of_hidden_units = 4

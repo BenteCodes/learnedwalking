@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 
 
-class RobotControlAbstract():
+class RobotControlAbstract(ABC):
 
 	@abstractmethod
 	def __init__(self, more_motors):

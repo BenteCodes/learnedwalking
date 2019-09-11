@@ -1,9 +1,10 @@
 from Network import Network
+from PopulationGeneratorAbstract import PopulationGeneratorAbstract 
 import random
 
 
 # genetic algorithm to learn basic pattern
-class PopulationGenerator:
+class PopulationGenerator(PopulationGeneratorAbstract):
 
     max_weight_change = 1
     number_of_kept_best_networks = 2
