@@ -1,12 +1,12 @@
-from MA.WalkingNetwork import WalkingNetwork
 from MA.PopulationGenerator import PopulationGenerator
 from MA.FitnessFunction import FitnessFunction
 from Tests.RobotControlDummy import RobotControlDummy
 import SafeData
 import numpy as np
+from GeneticAlgorithmAbstract import GeneticAlgorithmAbstract
 
 
-class GeneticAlgorithm:
+class GeneticAlgorithm(GeneticAlgorithmAbstract):
 
     number_of_steps_in_simulator = 400
 
@@ -72,7 +72,7 @@ class GeneticAlgorithm:
         for _1 in range(0, times):
             fitness += self.simulateFitnessOfNetwork(network)
             network.resetHiddenLayer()
-        return fitness / 3
+        return fitness / times
 
     def getRankedNetworks(self):  # get top5NWWithFitness
         fitnessList = []
