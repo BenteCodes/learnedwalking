@@ -2,13 +2,14 @@
 import numpy as np
 from scipy.stats import logistic
 from MA.SimplePatternGenerator import SimplePatternGenerator
-from NetworkAbstract import NetworkAbstract
+from Network3LayerAbstract import Network3LayerAbstract
 import random
+from builtins import staticmethod
 
 
 # class for that network
 # parameters: weights
-class WalkingNetwork(NetworkAbstract):
+class WalkingNetwork(Network3LayerAbstract):
     
     number_of_input_units = 10  # min 4
     number_of_hidden_units = 4
@@ -26,30 +27,7 @@ class WalkingNetwork(NetworkAbstract):
     def checkParameters(self, weights):
         if not(len(weights) == self.number_of_weights):
             print("Paramcheck: Weights of incorrect number_of_weights")
-            
-    # disects the weights into the corresponding network parts 
-    # 10input -> 4 hidden with recurrant -> 20 output   
-    def initNetwork(self, weights):
-        self.weights = weights
-        self.last_state_hidden = []
-        self.resetHiddenLayer() 
-        
-        position_start = 0
-        position_end = self.number_of_input_units * self.number_of_hidden_units
-        self.input_to_hidden_all = np.matrix(weights[position_start:position_end])
-        self.input_to_hidden_all = np.reshape(self.input_to_hidden_all, (self.number_of_input_units, self.number_of_hidden_units))
 
-        position_start = position_end
-        position_end += self.number_of_hidden_units        
-        self.hidden_to_hidden = np.matrix(weights[position_start:position_end])
-        
-        self.weights_to_hidden_units = self.prepareWeightsToHiddenUnits()
-
-        position_start = position_end
-        position_end += (self.number_of_hidden_units * self.number_of_output_units)         
-        self.hidden_to_output_all = np.matrix(weights[position_start:position_end])
-        self.hidden_to_output_all = np.reshape(self.hidden_to_output_all, (self.number_of_hidden_units, self.number_of_output_units))  # sort after connection not just a long list
-    
     def initInputPattern(self):
         self.simple_pattern = SimplePatternGenerator()    
     
@@ -119,7 +97,7 @@ class WalkingNetwork(NetworkAbstract):
     Afterwards streches and offsets the values so we get values between -1 and 1 instead of 0 and 1
     '''
 
-    def applySigmoidFunctionPlusOffsets(self, matrix):
+    def applySigmoidFunction(self, matrix):
         return (logistic.cdf(matrix) * 2) - 1
 
     '''
@@ -133,15 +111,20 @@ class WalkingNetwork(NetworkAbstract):
         # Actual computation of the output of the hidden layer
         # returns a 1 X number_of_hidden_units matrix
         diagonal_of_matrix_mul = np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])
-        self.last_state_hidden = self.applySigmoidFunctionPlusOffsets(diagonal_of_matrix_mul)  # TODO check this please, wtf + names!!
+        diagonal_of_matrix_mul = self.cropValues(diagonal_of_matrix_mul)
+        self.last_state_hidden = self.applySigmoidFunction(diagonal_of_matrix_mul)  # TODO check this please, wtf + names!!
         
         # Actual computation of the output of the network
         # returns a number_of_output_units X 1 matrixs
         matrix_mul = self.last_state_hidden * self.hidden_to_output_all
-        network_output = self.applySigmoidFunctionPlusOffsets(matrix_mul)
+        matrix_mul = self.cropValues(matrix_mul)
+        network_output = self.applySigmoidFunction(matrix_mul)
 
         self.areThereNonZeroOutputs(list(network_output))
         return network_output
+    
+    def cropValues(self, values):
+        return np.divide(values, len(values) / 2)
 
     def areThereNonZeroOutputs(self, state_output):
         are_there_non_zero_outputs_array = abs(max(state_output, key=abs)) > 0.05
@@ -150,9 +133,6 @@ class WalkingNetwork(NetworkAbstract):
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
     
-    def getNumberOfWeights(self):
-        return self.number_of_weights
-    
     def getWeightAt(self, index):
         return self.weights[index]
 
@@ -160,10 +140,13 @@ class WalkingNetwork(NetworkAbstract):
         return self.are_there_non_zero_outputs_value
     
     @staticmethod
+    def getNumberOfWeights():
+        return WalkingNetwork.number_of_weights
+        
+    @staticmethod
     def generateRandomWeights():
         weights = []
         for _i in range(0, WalkingNetwork.number_of_weights):
             weights.append(random.uniform(-1, 1))
             
         return weights
-
