@@ -4,7 +4,7 @@ Created on Sep 2, 2019
 @author: alica
 '''
 import pytest
-from WalkingNetwork import WalkingNetwork
+from MA.WalkingNetwork import WalkingNetwork
 import numpy as np
 
 

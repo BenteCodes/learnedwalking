@@ -1,4 +1,4 @@
-from WalkingNetwork import WalkingNetwork
+from MA.WalkingNetwork import WalkingNetwork
 from PopulationGeneratorAbstract import PopulationGeneratorAbstract 
 import random
 

@@ -1,6 +1,6 @@
-from WalkingNetwork import WalkingNetwork
-from PopulationGenerator import PopulationGenerator
-from FitnessFunction import FitnessFunction
+from MA.WalkingNetwork import WalkingNetwork
+from MA.PopulationGenerator import PopulationGenerator
+from MA.FitnessFunction import FitnessFunction
 from Tests.RobotControlDummy import RobotControlDummy
 import SafeData
 import numpy as np

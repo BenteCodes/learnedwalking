@@ -1,4 +1,4 @@
-import vrep
+from MA import vrep
 # from nicomotion import Motion
 import time
 from RobotControlAbstract import RobotControlAbstract 

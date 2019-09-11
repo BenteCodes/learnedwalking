@@ -1,7 +1,7 @@
 # Imports und so
 import numpy as np
 from scipy.stats import logistic
-from SimplePatternGenerator import SimplePatternGenerator
+from MA.SimplePatternGenerator import SimplePatternGenerator
 from NetworkAbstract import NetworkAbstract
 import random
 

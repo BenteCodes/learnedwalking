@@ -1,7 +1,7 @@
 import pytest
-from WalkingNetwork import WalkingNetwork
+from MA.WalkingNetwork import WalkingNetwork
 from Tests.RobotControlDummy import RobotControlDummy
-from GeneticAlgorithm import GeneticAlgorithm
+from MA.GeneticAlgorithm import GeneticAlgorithm
 
 
 def test_initNetwork():

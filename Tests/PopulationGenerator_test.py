@@ -4,8 +4,8 @@ Created on Sep 5, 2019
 @author: alica
 '''
 import pytest
-from PopulationGenerator import PopulationGenerator
-from WalkingNetwork import WalkingNetwork
+from MA.PopulationGenerator import PopulationGenerator
+from MA.WalkingNetwork import WalkingNetwork
 
 
 def test_mutate5050():
