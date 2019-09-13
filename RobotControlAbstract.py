@@ -4,7 +4,7 @@ from abc import abstractmethod, ABC
 class RobotControlAbstract(ABC):
 
 	@abstractmethod
-	def __init__(self, more_motors):
+	def __init__(self):
 		pass
 	
 	@abstractmethod
