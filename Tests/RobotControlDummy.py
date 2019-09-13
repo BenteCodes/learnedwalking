@@ -4,8 +4,8 @@ from RobotControlAbstract import RobotControlAbstract
 
 class RobotControlDummy(RobotControlAbstract):
     
-    def __init__(self, more_motors):
-        self.more_motors = more_motors
+    def __init__(self):
+        self.more_motors = 0  # default
       
     def startSimulation(self):
         pass
@@ -23,3 +23,7 @@ class RobotControlDummy(RobotControlAbstract):
     def getEvalData(self):
         return self.robotFell(), [0, 0], [0, self.motor_values[0][5]], [0, self.motor_values[0][10]]        
     
+    # TODO this is dirty!
+    def setMotorFlag(self, more_motors):
+        self.more_motors = more_motors
+

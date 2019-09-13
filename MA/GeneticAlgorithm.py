@@ -31,7 +31,8 @@ class GeneticAlgorithm(GeneticAlgorithmAbstract):
         
         self.max_iterations = iterations
         
-        self.robot_control = RobotControlDummy(motor_number_flag)
+        self.robot_control = RobotControlDummy()
+        self.robot_control.setMotorFlag(motor_number_flag)
         # self.robot_control = DummyRobotControl()
         
         self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
@@ -47,7 +48,7 @@ class GeneticAlgorithm(GeneticAlgorithmAbstract):
         
         robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
 
-        fitness = self.fitness_function.getFitness(network.are_there_non_zero_outputs_value, robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
+        fitness = self.fitness_function.getFitness(robot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l)
 
         # how fast did the robot move
         # distance / time_needed

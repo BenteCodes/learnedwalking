@@ -22,7 +22,6 @@ class WalkingNetwork(Network3LayerAbstract):
         self.checkParameters(weights)    
         self.initNetwork(weights)
         self.initInputPattern()
-        self.are_there_non_zero_outputs_value = False
     
     def checkParameters(self, weights):
         if not(len(weights) == self.number_of_weights):
@@ -120,25 +119,17 @@ class WalkingNetwork(Network3LayerAbstract):
         matrix_mul = self.cropValues(matrix_mul)
         network_output = self.applySigmoidFunction(matrix_mul)
 
-        self.areThereNonZeroOutputs(list(network_output))
         return network_output
     
     def cropValues(self, values):
         return np.divide(values, len(values) / 2)
 
-    def areThereNonZeroOutputs(self, state_output):
-        are_there_non_zero_outputs_array = abs(max(state_output, key=abs)) > 0.05
-        self.are_there_non_zero_outputs_value = (True in are_there_non_zero_outputs_array) == True
-    
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
     
     def getWeightAt(self, index):
         return self.weights[index]
 
-    def getMovement(self):
-        return self.are_there_non_zero_outputs_value
-    
     @staticmethod
     def getNumberOfWeights():
         return WalkingNetwork.number_of_weights

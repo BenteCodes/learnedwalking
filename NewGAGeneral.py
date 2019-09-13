@@ -8,6 +8,7 @@ from abc import abstractmethod, ABC
 import SafeData
 import numpy as np
 
+
 class NewGAGeneral(ABC):
 
     number_of_steps_in_simulator = 400
@@ -16,18 +17,23 @@ class NewGAGeneral(ABC):
     @abstractmethod
     def init_population(self):
         pass
+
     @abstractmethod        
     def initPopGen(self, popsize, mutation_rate, crossover_rate):
         pass        
+
     @abstractmethod
     def initRobotControl(self):
         pass
+
     @abstractmethod
     def initFitnessFunc(self):
         pass
+
     @abstractmethod
     def calcFitness(self):
         pass
+
     @abstractmethod
     def getOutputFromSim(self):
         pass
@@ -70,8 +76,8 @@ class NewGAGeneral(ABC):
 
     def walkInSimulator(self, network):
         for _i in range(0, self.number_of_steps_in_simulator):
-            data = self.robot_control.getOutput()
-            network.getInput(data)
+            # data = self.robot_control.getOutput()
+            # network.getInput(data)
             self.robot_control.walkRobot(network.computeOneStep())
             if(self.robot_control.robotFell()):
                 break
@@ -95,10 +101,9 @@ class NewGAGeneral(ABC):
         fitnessList.sort(key=lambda x: x[1], reverse=True)
         
         # compute mean fitness
-        #meanFitness = np.mean([row[1] for row in fitnessList], axis=0)
-        #TODO ununcomment these two lines
+        meanFitness = np.mean([row[1] for row in fitnessList], axis=0)
         # safe mean and top 5 fitnesses (no networks)
-        #self.safeMeanAndTop5Fitnesses(meanFitness, fitnessList)
+        self.safeMeanAndTop5Fitnesses(meanFitness, fitnessList)
         
         # return only the ordered networks (best first)
         

@@ -9,11 +9,15 @@ class RobotControl(RobotControlAbstract):
     oneshot = ""  # vrep.simx_opmode_oneshot
     oneshot_wait = ""  # vrep.simx_opmode_oneshot_wait
     
-    def __init__(self, more_motors):
-        self.more_motors = more_motors 
+    def __init__(self):
+        self.more_motors = 0
         # self.robot = Motion.Motion(self.robot_string, vrep=True, vrepHost='127.0.0.1', vrepPort=19997)
         vrep.simxFinish(-1)  # TODO explain why this is here
         self.clientID = vrep.simxStart('127.0.0.1', 19996, True, True, 5000, 5)
+        
+    # TODO this is dirty!
+    def setMotorFlag(self, more_motors):
+        self.more_motors = more_motors
       
     def startSimulation(self):
         time.sleep(0.5)

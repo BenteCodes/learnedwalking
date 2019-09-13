@@ -1,7 +1,6 @@
 import pytest
-from MA.WalkingNetwork import WalkingNetwork
-from Tests.RobotControlDummy import RobotControlDummy
 from MA.GeneticAlgorithm import GeneticAlgorithm
+from MA.GA_New import GeneticAlgorithmNew
 
 
 def test_initNetwork():
@@ -12,6 +11,11 @@ def test_initNetwork():
 # THIS IS NOT A UNIT TEST!!! ONLY MANUAL EXECUTION
 def fullRun():
     cord = GeneticAlgorithm(6, 50, 50, 3, 0)
+    cord.evolve()
+
+
+def fullRun2():
+    cord = GeneticAlgorithmNew(6, 50, 50, 3, 0)
     cord.evolve()
 
 

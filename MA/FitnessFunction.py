@@ -7,9 +7,9 @@ class FitnessFunction(FitnessFunctionAbstract):
     def __init__(self):
         pass
 
-    def getFitness(self, did_move, did_fall, position_ref, position_robot_foot_r, position_robot_foot_l):
+    def getFitness(self, did_fall, position_ref, position_robot_foot_r, position_robot_foot_l):
         fitness = 0
-        fitness += self.penalizeNonMovement(did_move)
+        # fitness += self.penalizeNonMovement(did_move)
 
         fitness += self.penalizeFalling(did_fall)
 
@@ -21,10 +21,9 @@ class FitnessFunction(FitnessFunctionAbstract):
             return -100  # really don't fall
         return 0
 
-    def penalizeNonMovement(self, did_move):
-        if not did_move:
-            return -2000  # really, really move
-        return 0
+    # def penalizeNonMovement(self, did_move):
+        # if not did_move:
+        # return -2000  # really, really move
 
     def calcDistanceMoved(self, pos_start, pos_foot_r, pos_foot_l):
         distance_right_foot = self.calcEuclideanDistance(pos_start, pos_foot_r)
