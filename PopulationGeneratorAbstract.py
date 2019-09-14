@@ -10,8 +10,8 @@ class PopulationGeneratorAbstract(ABC):
 
     @abstractmethod
     def createNextGeneration(self, old_networks_sorted_by_fitness):
-        pass
+        return NotImplementedError
             
     @abstractmethod
     def initPopulation(self):
-        pass
+        return NotImplementedError

@@ -88,7 +88,7 @@ class RobotControl(RobotControlAbstract):
         self.setRightLegHorizontal(motorValues)       
         if all_motors:
             self.setRightLegVertical(motorValues)
-      
+            
     def getEvalData(self):
         cube_handle = vrep.simxGetObjectHandle(self.clientID, "reference_cube", self.oneshot_wait)
         [_m, position_ref] = vrep.simxGetObjectPosition(self.clientID, cube_handle[1], -1, self.oneshot_wait)  # print(position_ref)

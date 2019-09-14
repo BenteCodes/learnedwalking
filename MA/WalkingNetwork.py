@@ -129,6 +129,9 @@ class WalkingNetwork(Network3LayerAbstract):
     
     def getWeightAt(self, index):
         return self.weights[index]
+    
+    def takeInputFromSim(self, data):
+        pass  # not applicable as this does not take any input
 
     @staticmethod
     def getNumberOfWeights():

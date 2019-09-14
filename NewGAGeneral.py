@@ -11,33 +11,37 @@ import numpy as np
 
 class NewGAGeneral(ABC):
 
-    number_of_steps_in_simulator = 400
-    simulator_repetitions = 3
+    number_of_steps_in_simulator = 100
+    simulator_repetitions = 1
 
     @abstractmethod
     def init_population(self):
-        pass
+        return NotImplementedError
 
     @abstractmethod        
     def initPopGen(self, popsize, mutation_rate, crossover_rate):
-        pass        
+        return NotImplementedError        
 
     @abstractmethod
     def initRobotControl(self):
-        pass
+        return NotImplementedError
 
     @abstractmethod
     def initFitnessFunc(self):
-        pass
+        return NotImplementedError
 
     @abstractmethod
     def calcFitness(self):
-        pass
+        return NotImplementedError
 
     @abstractmethod
-    def getOutputFromSim(self):
-        pass
+    def getEvalFromSim(self):
+        return NotImplementedError
     
+    @abstractmethod
+    def dataExchangeDuringRun(self):
+        return NotImplementedError
+
     def checkParameters(self, popsize, mutation_rate, crossover_rate, iterations):
         if popsize < 5:
             print("Paramcheck: Population size needs to be at least 5")
@@ -66,7 +70,7 @@ class NewGAGeneral(ABC):
         # print('start moving')
         self.walkInSimulator(network)
         
-        dataDump = self.getOutputFromSim()
+        dataDump = self.getEvalFromSim()
         
         fitness = self.calcFitness(dataDump)
 
@@ -76,9 +80,8 @@ class NewGAGeneral(ABC):
 
     def walkInSimulator(self, network):
         for _i in range(0, self.number_of_steps_in_simulator):
-            # data = self.robot_control.getOutput()
-            # network.getInput(data)
-            self.robot_control.walkRobot(network.computeOneStep())
+            sensor_data = self.robot_control.walkRobot(network.computeOneStep())
+            network.takeInputFromSim(sensor_data)
             if(self.robot_control.robotFell()):
                 break
 

@@ -9,20 +9,20 @@ class RobotControlAbstract(ABC):
 	
 	@abstractmethod
 	def startSimulation(self):
-		pass  
+		return NotImplementedError  
 	
 	@abstractmethod
 	def stopSimulation(self):
-		pass
+		return NotImplementedError
 	
 	@abstractmethod
 	def robotFell(self):
-		pass
+		return NotImplementedError
 	
 	@abstractmethod
 	def walkRobot(self, motor_values):
-		pass
+		return NotImplementedError
 
 	@abstractmethod
 	def getEvalData(self):
-		pass
+		return NotImplementedError

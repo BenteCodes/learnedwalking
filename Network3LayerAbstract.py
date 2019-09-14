@@ -26,6 +26,10 @@ class Network3LayerAbstract(ABC):
     @abstractmethod
     def getWeightAt(self, index):
         return NotImplementedError
+    
+    @abstractmethod
+    def takeInputFromSim(self, data):
+        return NotImplementedError
 
     # disects the weights into the corresponding network parts 
     # 10input -> 4 hidden with recurrant -> 20 output   

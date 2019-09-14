@@ -34,7 +34,9 @@ class GeneticAlgorithmNew(NewGAGeneral):
         fitness = self.fitness_function.getFitness(data[0], data[1], data [2], data[3])
         return fitness
 
-    def getOutputFromSim(self):
+    def getEvalFromSim(self):
         passrobot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l = self.robot_control.getEvalData()
         return passrobot_fell, start_point, pos_robot_foot_r, pos_robot_foot_l
 
+    def dataExchangeDuringRun(self):
+        pass

@@ -20,3 +20,4 @@ def fullRun2():
 
 
 fullRun()
+fullRun2()

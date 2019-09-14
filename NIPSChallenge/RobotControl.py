@@ -42,10 +42,8 @@ class RobotControlNips(RobotControlAbstract):
     def walkRobot(self, motor_values):
         [self.observation, reward, self.done, info] = self.client.env_step(motor_values)
         self.reward += reward
-        print(info)
+        print(info)  # TODO what is info/remove
+        return self.observation
 
     def getEvalData(self):
         return self.reward
-    
-    def getFeedback(self):
-        return self.observation

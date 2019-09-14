@@ -136,6 +136,9 @@ class NIPSNetwork(Network3LayerAbstract):
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
     
+    def takeInputFromSim(self, data):
+        pass  # TODO
+    
     @staticmethod
     def getNumberOfWeights(self):
         return NIPSNetwork.number_of_weights
