@@ -9,7 +9,7 @@ import SafeData
 import numpy as np
 
 
-class NewGAGeneral(ABC):
+class GeneticAlgorithmTemplate(ABC):
 
     number_of_steps_in_simulator = 100
     simulator_repetitions = 1
@@ -38,10 +38,6 @@ class NewGAGeneral(ABC):
     def getEvalFromSim(self):
         return NotImplementedError
     
-    @abstractmethod
-    def dataExchangeDuringRun(self):
-        return NotImplementedError
-
     def checkParameters(self, popsize, mutation_rate, crossover_rate, iterations):
         if popsize < 5:
             print("Paramcheck: Population size needs to be at least 5")

@@ -1,5 +1,5 @@
 import pytest
-from FitnessFunction import FitnessFunction
+from MA.FitnessFunction import FitnessFunction
 from math import sqrt
 
 
@@ -7,10 +7,6 @@ def test_penalizeFalling():
     test_fitnessfunc = FitnessFunction()
     assert test_fitnessfunc.penalizeFalling(True) == -100, 'falling wrongly penalized'
     assert test_fitnessfunc.penalizeFalling(False) == 0, 'not falling penalized'
-
-
-def test_penalizeNonMovement():
-    pass  # TODO: implement test_penalizeNonMovement
 
 
 def test_calcDistanceMoved():
