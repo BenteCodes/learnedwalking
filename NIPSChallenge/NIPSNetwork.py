@@ -13,13 +13,14 @@ from builtins import staticmethod
 
 
 class NIPSNetwork(Network3LayerAbstract):
-    
-    number_of_input_units = 20  # TODO  # min 4
+    number_of_sensory_inputs = 16
+    number_of_pattern_inputs = 4
+    number_of_input_units = number_of_pattern_inputs + number_of_sensory_inputs  # TODO split into sensory and pattern input # min 4
     number_of_hidden_units = 4
     number_of_output_units = 22
     number_of_weights = (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)
 
-    # @input weights weights of the network
+    # @input_during_run weights weights of the network
 
     def __init__(self, weights): 
         self.checkParameters(weights)    
@@ -35,7 +36,7 @@ class NIPSNetwork(Network3LayerAbstract):
         self.simple_pattern = SimplePatternGenerator()    
     
     '''
-    Combines the weights from the input layer to the hidden layer and the recurrent weights of the hidden layer
+    Combines the weights from the input_during_run layer to the hidden layer and the recurrent weights of the hidden layer
     into one matrix.
     Only needed once per network
     ''' 
@@ -45,24 +46,21 @@ class NIPSNetwork(Network3LayerAbstract):
         weights_to_hidden_units = np.transpose(weights_to_hidden_units)
         return weights_to_hidden_units
     
-    # need to be a 10x1 matrix for matrix purposes, though only 5 get used
     def getInput(self):
-        input_matrix = np.zeros((self.number_of_input_units, 1))
 
-        input_matrix = self.getInputFromSimplePattern(input_matrix, np)
+        input_pattern = self.getInputFromSimplePattern() 
 
+        input_matrix = np.append(input_pattern, self.input_during_run)
+        
         return input_matrix
     
-    def getInputFromSimplePattern(self, input_matrix, np):
+    def getInputFromSimplePattern(self):
         results = self.simple_pattern.nextStep()
         
-        for index in range(self.simple_pattern.getNumberOfPatterns()):
-            np.put(input_matrix, index, results[index])
-        
-        return input_matrix
+        return np.array(results)
 
     # forewardpropagation
-    # input is a np matrix [10x1]
+    # input_during_run is a np matrix [10x1]
 
     '''
     Creates one inputvector for every hidden neuron and saves them into a 
@@ -78,21 +76,21 @@ class NIPSNetwork(Network3LayerAbstract):
         return state_input
 
     '''
-    Adds the previous output of the hidden units to the input vectors in the matrix
+    Adds the previous output of the hidden units to the input_during_run vectors in the matrix
     '''
 
     def addRecurrentInputs(self, state_input):
         assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
         return assembled_hidden_input
 
-    '''
-    Fetches all input values and creates the matrix for the multiplication
-    '''
+    def appendHiddenLayer(self, oneD_input_vector):
+        number_of_input_units_times_number_of_hidden_units_matrix = self.duplicateInputByNumberOfHiddenUnits(oneD_input_vector)
+        values_into_hidden_units = self.addRecurrentInputs(number_of_input_units_times_number_of_hidden_units_matrix)
+        return values_into_hidden_units
 
     def createHiddenLayerInput(self):
         oneD_input_vector = self.getInput()
-        number_of_input_units_times_number_of_hidden_units_matrix = self.duplicateInputByNumberOfHiddenUnits(oneD_input_vector)
-        values_into_hidden_units = self.addRecurrentInputs(number_of_input_units_times_number_of_hidden_units_matrix)
+        values_into_hidden_units = self.appendHiddenLayer(oneD_input_vector)
         return values_into_hidden_units
 
     '''
@@ -104,7 +102,7 @@ class NIPSNetwork(Network3LayerAbstract):
         return logistic.cdf(matrix)
 
     '''
-    One run through the network. From input to hidden, hidden to output
+    One run through the network. From input_during_run to hidden, hidden to output
     With recursive neurons and sigmoid function
     '''
 
@@ -123,21 +121,16 @@ class NIPSNetwork(Network3LayerAbstract):
         matrix_mul = self.ropValues(matrix_mul)
         network_output = self.applySigmoidFunction(matrix_mul)
 
-        self.areThereNonZeroOutputs(list(network_output))
         return network_output
     
     def cropValues(self, values):
         return np.divide(values, len(values) / 2)
 
-    def areThereNonZeroOutputs(self, state_output):
-        are_there_non_zero_outputs_array = abs(max(state_output, key=abs)) > 0.05
-        self.are_there_non_zero_outputs_value = (True in are_there_non_zero_outputs_array) == True
-    
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
     
     def takeInputFromSim(self, data):
-        pass  # TODO
+        self.input_during_run = data
     
     @staticmethod
     def getNumberOfWeights(self):
