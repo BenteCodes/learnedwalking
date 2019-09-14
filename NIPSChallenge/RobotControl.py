@@ -40,7 +40,9 @@ class RobotControlNips(RobotControlAbstract):
         return False
 
     def walkRobot(self, motor_values):
-        [self.observation, reward, self.done, info] = self.client.env_step(motor_values)
+        [observation, reward, done, info] = self.client.env_step(motor_values)
+        self.observation = observation
+        self.done = done
         self.reward += reward
         print(info)  # TODO what is info/remove
         return self.observation
