@@ -5,7 +5,7 @@ Created on 12 Sep 2019
 '''
 from MA.PopulationGenerator import PopulationGenerator
 from MA.FitnessFunction import FitnessFunction
-from Tests.RobotControlDummy import RobotControlDummy
+from MA.Tests.RobotControlDummy import RobotControlDummy
 from GeneticAlgorithmTemplate import GeneticAlgorithmTemplate
 
 
