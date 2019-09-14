@@ -45,7 +45,8 @@ class RobotControlNips(RobotControlAbstract):
         self.done = done
         self.reward += reward
         print(info)  # TODO what is info/remove
-        return self.observation
+        return np.zeros((16, 1))  # TODO fix once real number is known
+        # return self.prepareObersavationForNw(self.observation)
 
     def getEvalData(self):
         return self.reward
