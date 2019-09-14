@@ -86,7 +86,7 @@ class GeneticAlgorithmTemplate(ABC):
         for _1 in range(0, times):
             fitness += self.simulateFitnessOfNetwork(network)
             network.resetHiddenLayer()
-        return fitness / times
+        return (fitness / times)
 
     def getRankedNetworks(self):  # get top5NWWithFitness
         fitnessList = []

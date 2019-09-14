@@ -5,7 +5,6 @@ from pathlib import Path
 class SimplePatternGenerator:
 
     base_path = Path(__file__).parent
-    base_path = base_path.parent
     base_path = (base_path / 'csv/').resolve()
     path1 = (base_path / 'sinepattern.csv').resolve()
     path2 = (base_path / 'plussinepattern.csv').resolve()

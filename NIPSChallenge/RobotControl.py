@@ -49,4 +49,4 @@ class RobotControlNips(RobotControlAbstract):
         # return self.prepareObersavationForNw(self.observation)
 
     def getEvalData(self):
-        return self.reward
+        return self.reward  # FIXME this seems to be a tuple?
