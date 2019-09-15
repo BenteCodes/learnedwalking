@@ -2,7 +2,8 @@
 import numpy as np
 from SimplePatternGenerator import SimplePatternGenerator
 from Network3LayerAbstract import Network3LayerAbstract
-from abc import abstractmethod, abstractclassmethod
+from abc import abstractmethod
+import random
 
 
 # class for that network
@@ -84,13 +85,13 @@ class NetworkTemplate(Network3LayerAbstract):
         # returns a 1 X number_of_hidden_units matrix
         diagonal_of_matrix_mul = np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])
         diagonal_of_matrix_mul = self.cropValues(diagonal_of_matrix_mul)
-        self.last_state_hidden = self.applySigmoidFunction(diagonal_of_matrix_mul)
+        self.last_state_hidden = self.applyActivationFunction(diagonal_of_matrix_mul)
         
         # Actual computation of the output of the network
         # returns a number_of_output_units X 1 matrixs
         matrix_mul = self.last_state_hidden * self.hidden_to_output_all
         matrix_mul = self.cropValues(matrix_mul)
-        network_output = self.applySigmoidFunction(matrix_mul)
+        network_output = self.applyActivationFunction(matrix_mul)
 
         return network_output
     
@@ -102,9 +103,21 @@ class NetworkTemplate(Network3LayerAbstract):
     
     def getWeightAt(self, index):
         return self.weights[index]
+    
+    @classmethod
+    def getNumberOfWeights(cls):
+        return cls.number_of_weights
+        
+    @classmethod
+    def generateRandomWeights(cls):
+        weights = []
+        for _i in range(0, cls.number_of_weights):
+            weights.append(random.uniform(cls.start_weights[0], cls.start_weights[1]))
+            
+        return weights
 
     @abstractmethod
-    def applySigmoidFunction(self, matrix):
+    def applyActivationFunction(self, matrix):
         return NotImplementedError
 
     @abstractmethod
@@ -113,12 +126,4 @@ class NetworkTemplate(Network3LayerAbstract):
     
     @abstractmethod
     def takeInputFromSim(self, data):
-        return NotImplementedError
-
-    @abstractclassmethod
-    def getNumberOfWeights():
-        return NotImplementedError
-        
-    @abstractclassmethod    
-    def generateRandomWeights():
         return NotImplementedError
