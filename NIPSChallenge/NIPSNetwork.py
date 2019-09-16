@@ -20,7 +20,7 @@ class NIPSNetwork(NetworkTemplate):
 
     def getInput(self):
         input_pattern = self.getInputFromSimplePattern() 
-
+        self.input_during_run = np.zeros((16, 1))  # TODO This has to be initialized and implemented for usefull data
         input_matrix = np.append(input_pattern, self.input_during_run)
         
         return input_matrix

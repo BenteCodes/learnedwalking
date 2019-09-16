@@ -3,8 +3,8 @@ Created on 11.09.2019
 
 @author: TKler
 '''
-from MA.PopulationGenerator import PopulationGenerator
-from NIPSChallenge.RobotControl import RobotControlNips
+from NIPSChallenge.PopGenNips import PopulationGeneratorNips
+from NIPSChallenge.RobotControl_local import RobotControlNipsLocal
 from NIPSChallenge.FitnessFunction import FitnessFunction
 from GeneticAlgorithmTemplate import GeneticAlgorithmTemplate
 
@@ -21,10 +21,10 @@ class GeneticAlgorithm(GeneticAlgorithmTemplate):
         self.population = self.pop_generator.initPopulation()
 
     def initPopGen(self, popsize, mutation_rate, crossover_rate):
-        self.pop_generator = PopulationGenerator(popsize, mutation_rate, crossover_rate)
+        self.pop_generator = PopulationGeneratorNips(popsize, mutation_rate, crossover_rate)
 
     def initRobotControl(self):
-        self.robot_control = RobotControlNips()
+        self.robot_control = RobotControlNipsLocal()
 
     def initFitnessFunc(self):
         self.fitness_function = FitnessFunction()
