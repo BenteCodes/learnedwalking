@@ -7,7 +7,7 @@ import opensim as osim  # This error is here because of the virtual env
 from osim.http.client import Client  # This error is here because of the virtual env
 import numpy as np
 from RobotControlAbstract import RobotControlAbstract
-import NIPSChallenge.JSONStuff
+import NIPSChallenge.JSONStuff as JSONStuff
 
 
 class RobotControlNips(RobotControlAbstract):
