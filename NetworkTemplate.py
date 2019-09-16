@@ -40,9 +40,10 @@ class NetworkTemplate(Network3LayerAbstract):
 
     def duplicateInputByNumberOfHiddenUnits(self, state_input):
         state_input = np.array([state_input])
+        state_input = np.transpose(state_input)
         input_matrix = state_input
         for _i in range(1, self.number_of_hidden_units):
-            state_input = np.concatenate((state_input, input_matrix), axis=0)
+            state_input = np.concatenate((state_input, input_matrix), axis=1)
         return state_input
 
     '''
