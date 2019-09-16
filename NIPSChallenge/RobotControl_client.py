@@ -38,7 +38,7 @@ class RobotControlNipsClient(RobotControlAbstract):
             print('stopped simulation')
 
     def robotFell(self):
-        return False
+        return self.done
 
     def walkRobot(self, motor_values):
         motor_values = JSONStuff.transformActionIntoJSON(motor_values)
