@@ -1,5 +1,7 @@
 import csv
 from pathlib import Path
+import json
+from NIPSChallenge.NIPSNetwork import NIPSNetwork
 
     
 def safeMeanAndTop5Fitnesses(mean_fitness, best_5_fitnesses):
@@ -23,3 +25,24 @@ def getBasePath():
     base_path = Path(__file__).parent
     base_path = (base_path / 'output/').resolve()
     return base_path
+
+
+def safePopulation(pop):
+    data = {} 
+    data['networks'] = []
+    for nw in pop:
+        data['networks'].append({
+            'weights': nw.weights,
+            })
+    
+    with open('data_file.json', 'w') as outfile:
+        json.dump(data, outfile)
+
+    
+def loadPopulation():
+    population = []
+    with open('data_file.json') as json_file:
+        data = json.load(json_file)
+    for nw in data['networks']:
+        population.append(NIPSNetwork(nw['weights']))
+    return population

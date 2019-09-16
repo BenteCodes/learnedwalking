@@ -17,7 +17,7 @@ class NIPSNetwork(NetworkTemplate):
     number_of_output_units = 22
     number_of_weights = (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)
     start_weights = [0, 1]
-
+    
     def getInput(self):
         input_pattern = self.getInputFromSimplePattern() 
         self.input_during_run = np.zeros((16, 1))  # TODO This has to be initialized and implemented for usefull data

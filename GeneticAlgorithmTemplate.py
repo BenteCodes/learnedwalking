@@ -117,7 +117,9 @@ class GeneticAlgorithmTemplate(ABC):
 
     def evolve(self):
         for curr_it in range(0, self.max_iterations):
+            SafeData.safePopulation(self.population)
             rankedNetworks = self.getRankedNetworks()
             self.safeNetwork(rankedNetworks[0])
             self.population = self.pop_generator.createNextGeneration(rankedNetworks)
             print("Current iteration:" + str(curr_it + 1))
+

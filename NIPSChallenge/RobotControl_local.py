@@ -35,12 +35,10 @@ class RobotControlNipsLocal(RobotControlAbstract):
         return False
 
     def walkRobot(self, motor_values):
-        print(len(motor_values[0]))
         [observation, reward, done, info] = self.env.step(motor_values[0])
         self.observation = observation
         self.done = done
         self.reward += reward  # >TODO check if reward is cumulativ on it's own
-        print(info)  # TODO what is info/remove
         return np.zeros((16, 1))  # TODO fix once real number is known
         # return self.prepareObersavationForNw(self.observation)
 
