@@ -16,23 +16,17 @@ class RobotControlNipsLocal(RobotControlAbstract):
     '''
 
     def __init__(self):
-        
         # Create environment
         self.env = L2M2019Env(visualize=True)
         self.observation = self.env.reset()
         self.reward = 0
 
     def startSimulation(self):
-        print('start simulation')
         self.reward = 0
         self.observation = self.env.reset()
 
-    def stopSimulation(self):
-        if self.done:
-            print('stopped simulation')
-
     def robotFell(self):
-        return False
+        return self.done
 
     def walkRobot(self, motor_values):
         [observation, reward, done, info] = self.env.step(motor_values[0])
@@ -43,4 +37,4 @@ class RobotControlNipsLocal(RobotControlAbstract):
         # return self.prepareObersavationForNw(self.observation)
 
     def getEvalData(self):
-        return self.reward  # FIXME this seems to be a tuple?
+        return self.reward

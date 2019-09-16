@@ -12,10 +12,6 @@ class RobotControlAbstract(ABC):
 		return NotImplementedError  
 	
 	@abstractmethod
-	def stopSimulation(self):
-		return NotImplementedError
-	
-	@abstractmethod
 	def robotFell(self):
 		return NotImplementedError
 	

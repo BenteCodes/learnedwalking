@@ -61,16 +61,12 @@ class GeneticAlgorithmTemplate(ABC):
         self.initFitnessFunc()
 
     def simulateFitnessOfNetwork(self, network):
-        # print('start simulation')
         self.robot_control.startSimulation()
-        # print('start moving')
         self.walkInSimulator(network)
         
         dataDump = self.getEvalFromSim()
         
         fitness = self.calcFitness(dataDump)
-
-        self.robot_control.stopSimulation()
 
         return fitness
 
