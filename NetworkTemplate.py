@@ -1,4 +1,3 @@
-# Imports und so
 import numpy as np
 from SimplePatternGenerator import SimplePatternGenerator
 from Network3LayerAbstract import Network3LayerAbstract
@@ -41,11 +40,9 @@ class NetworkTemplate(Network3LayerAbstract):
 
     def duplicateInputByNumberOfHiddenUnits(self, state_input):
         state_input = np.array([state_input])
-        hidden = self.number_of_hidden_units
         input_matrix = state_input
-        while hidden > 1:
+        for _i in range(1, self.number_of_hidden_units):
             state_input = np.concatenate((state_input, input_matrix), axis=0)
-            hidden -= 1
         return state_input
 
     '''
