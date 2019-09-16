@@ -11,7 +11,7 @@ from GeneticAlgorithmTemplate import GeneticAlgorithmTemplate
 
 class GeneticAlgorithm(GeneticAlgorithmTemplate):
 
-    number_of_steps_in_simulator = 400  # FIXME
+    number_of_steps_in_simulator = 200  
     simulator_repetitions = 1
 
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations):
