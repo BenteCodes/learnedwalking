@@ -37,6 +37,7 @@ def safePopulation(pop):
     
     with open('data_file.json', 'w') as outfile:
         json.dump(data, outfile)
+    print("safed population to json")
 
     
 def loadPopulation():
@@ -45,4 +46,5 @@ def loadPopulation():
         data = json.load(json_file)
     for nw in data['networks']:
         population.append(NIPSNetwork(nw['weights']))
+    print("loaded population to json")
     return population

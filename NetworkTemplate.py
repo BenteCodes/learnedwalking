@@ -80,19 +80,18 @@ class NetworkTemplate(Network3LayerAbstract):
         # Actual computation of the output of the hidden layer
         # returns a 1 X number_of_hidden_units matrix
         diagonal_of_matrix_mul = np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])
-        diagonal_of_matrix_mul = self.normaliseNeuronInputSomewhat(diagonal_of_matrix_mul)
+        # diagonal_of_matrix_mul = self.normaliseNeuronInputSomewhat(diagonal_of_matrix_mul)
         self.last_state_hidden = self.applyActivationFunction(diagonal_of_matrix_mul)
         
         # Actual computation of the output of the network
         # returns a number_of_output_units X 1 matrixs
         matrix_mul = self.last_state_hidden * self.hidden_to_output_all
-        matrix_mul = self.normaliseNeuronInputSomewhat(matrix_mul)
+        # matrix_mul = self.normaliseNeuronInputSomewhat(matrix_mul)
         network_output = self.applyActivationFunction(matrix_mul)
-
         return network_output
     
     def normaliseNeuronInputSomewhat(self, values):
-        return np.divide(values, len(values) / 2)
+        return np.divide(values, 1)
 
     def resetHiddenLayer(self):
         self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element

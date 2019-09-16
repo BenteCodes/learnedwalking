@@ -88,7 +88,7 @@ class GeneticAlgorithmTemplate(ABC):
         fitnessList = []
 
         # create a list of networks their fitness
-        for index in range(0, len(self.population)):  
+        for index in range(0, len(self.population)):
             fitness = self.getFitnessAveragedOverXTimes(self.population[index], self.simulator_repetitions)
             fitnessList.append([self.population[index], fitness])
         
@@ -112,10 +112,10 @@ class GeneticAlgorithmTemplate(ABC):
         SafeData.safeNetwork(best_network)
 
     def evolve(self):
-        for curr_it in range(0, self.max_iterations):
-            SafeData.safePopulation(self.population)
+        for curr_it in range(1, self.max_iterations + 1):
+            print("Current iteration:" + str(curr_it))
             rankedNetworks = self.getRankedNetworks()
             self.safeNetwork(rankedNetworks[0])
+            SafeData.safePopulation(self.population)
             self.population = self.pop_generator.createNextGeneration(rankedNetworks)
-            print("Current iteration:" + str(curr_it + 1))
 
