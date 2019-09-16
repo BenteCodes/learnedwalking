@@ -1,4 +1,3 @@
-# Imports und so
 from scipy.stats import logistic
 from NetworkTemplate import NetworkTemplate
 

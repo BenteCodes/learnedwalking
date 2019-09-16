@@ -7,6 +7,7 @@ import opensim as osim  # This error is here because of the virtual env
 from osim.http.client import Client  # This error is here because of the virtual env
 import numpy as np
 from RobotControlAbstract import RobotControlAbstract
+import NIPSChallenge.JSONStuff
 
 
 class RobotControlNips(RobotControlAbstract):
@@ -40,6 +41,7 @@ class RobotControlNips(RobotControlAbstract):
         return False
 
     def walkRobot(self, motor_values):
+        motor_values = JSONStuff.transformActionIntoJSON(motor_values)
         [observation, reward, done, info] = self.client.env_step(motor_values)
         self.observation = observation
         self.done = done
