@@ -99,24 +99,20 @@ class GeneticAlgorithmTemplate(ABC):
         # compute mean fitness
         meanFitness = np.mean([row[1] for row in fitnessList], axis=0)
         # safe mean and top 5 fitnesses (no networks)
-        self.safeMeanAndTop5Fitnesses(meanFitness, fitnessList)
+        self.safeMeanAndTopXFitnesses(meanFitness, fitnessList)
         
         # return only the ordered networks (best first)
         
         print([row[1] for row in fitnessList][:5])
         return [row[0] for row in fitnessList]
 
-    def safeMeanAndTop5Fitnesses(self, mean_fitness, fitnessList):
-        SafeData.safeMeanAndTop5Fitnesses(mean_fitness, [row[1] for row in fitnessList][:self.number_of_documented_fitnesses_per_iteration])
-
-    def safeNetwork(self, best_network):
-        SafeData.safeNetwork(best_network)
+    def safeMeanAndTopXFitnesses(self, mean_fitness, fitnessList):
+        SafeData.safeMeanAndTopXFitnesses(mean_fitness, [row[1] for row in fitnessList][:self.number_of_documented_fitnesses_per_iteration])
 
     def evolve(self):
         for curr_it in range(1, self.max_iterations + 1):
             print("Current iteration:" + str(curr_it))
             rankedNetworks = self.getRankedNetworks()
-            self.safeNetwork(rankedNetworks[0])
             SafeData.safePopulation(self.population)
             self.population = self.pop_generator.createNextGeneration(rankedNetworks)
 

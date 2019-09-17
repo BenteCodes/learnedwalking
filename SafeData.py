@@ -4,21 +4,15 @@ import json
 from NIPSChallenge.NIPSNetwork import NIPSNetwork
 
     
-def safeMeanAndTop5Fitnesses(mean_fitness, best_5_fitnesses):
+def safeMeanAndTopXFitnesses(mean_fitness, best_x_fitnesses):
     path = (getBasePath() / 'fitness.csv').resolve()
+    fitness_string = ''
+    for fitness in best_x_fitnesses:
+        fitness_string = fitness_string + str(fitness) + ' '
     with open(str(path), 'a') as csvfile1:
         errorwriter = csv.writer(csvfile1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
-        errorwriter.writerow([str(mean_fitness), str(best_5_fitnesses[0]), str(best_5_fitnesses[1]), str(best_5_fitnesses[2]), str(best_5_fitnesses[3]), str(best_5_fitnesses[4])])
-
-
-def safeNetwork(best_network):
-    path = (getBasePath() / 'best_network.csv').resolve()
-    with open(str(path), 'w+') as csvfile:
-        weightwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        weightstring = []
-        for weight in best_network.weights:weightstring.append(str(weight) + ',')
-        weightwriter.writerow(weightstring)
+        errorwriter.writerow([str(mean_fitness), fitness_string])
 
 
 def getBasePath():
