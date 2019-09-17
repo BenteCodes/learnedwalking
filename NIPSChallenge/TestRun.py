@@ -8,7 +8,7 @@ import SafeData
 
 
 def fullRun():
-    cord = GeneticAlgorithm(5, 50, 50, 2)
+    cord = GeneticAlgorithm(5, 0, 0, 20)
     cord.population = loadpop()[:5]
     cord.evolve()
 
