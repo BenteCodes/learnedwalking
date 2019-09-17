@@ -8,7 +8,7 @@ def safeMeanAndTopXFitnesses(mean_fitness, best_x_fitnesses):
     path = (getBasePath() / 'fitness.csv').resolve()
     fitness_string = ''
     for fitness in best_x_fitnesses:
-        fitness_string = fitness_string + str(fitness) + ' '
+        fitness_string += str(fitness) + ' '
     with open(str(path), 'a') as csvfile1:
         errorwriter = csv.writer(csvfile1, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 

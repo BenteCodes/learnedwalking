@@ -15,7 +15,17 @@ class GeneticAlgorithm(GeneticAlgorithmTemplate):
     simulator_repetitions = 3
 
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations, motor_number_flag):
-        super().__init__(popsize, mutation_rate, crossover_rate, iterations)
+        super().checkParameters(popsize, mutation_rate, crossover_rate, iterations)
+                
+        self.max_iterations = iterations
+        
+        self.initRobotControl()
+
+        self.initPopGen(popsize, mutation_rate, crossover_rate)        
+        self.init_population()
+        
+        self.initFitnessFunc()
+        
         self.robot_control.setMotorFlag(motor_number_flag)
         
     def init_population(self):

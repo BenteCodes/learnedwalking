@@ -14,8 +14,17 @@ class GeneticAlgorithm(GeneticAlgorithmTemplate):
     number_of_steps_in_simulator = 200 
     simulator_repetitions = 1
 
-    def __init__(self, popsize, mutation_rate, crossover_rate, iterations):
-        super().__init__(popsize, mutation_rate, crossover_rate, iterations)
+    def __init__(self, popsize, mutation_rate, crossover_rate, iterations, visualization):
+        super().checkParameters(popsize, mutation_rate, crossover_rate, iterations)
+        
+        self.max_iterations = iterations
+        
+        self.initRobotControl(visualization)
+
+        self.initPopGen(popsize, mutation_rate, crossover_rate)        
+        self.init_population()
+        
+        self.initFitnessFunc()
         
     def init_population(self):
         self.population = self.pop_generator.initPopulation()
@@ -23,8 +32,8 @@ class GeneticAlgorithm(GeneticAlgorithmTemplate):
     def initPopGen(self, popsize, mutation_rate, crossover_rate):
         self.pop_generator = PopulationGeneratorNips(popsize, mutation_rate, crossover_rate)
 
-    def initRobotControl(self):
-        self.robot_control = RobotControlNipsLocal()
+    def initRobotControl(self, visualization):
+        self.robot_control = RobotControlNipsLocal(visualization)
 
     def initFitnessFunc(self):
         self.fitness_function = FitnessFunction()

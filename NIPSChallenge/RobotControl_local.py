@@ -15,9 +15,9 @@ class RobotControlNipsLocal(RobotControlAbstract):
     Initiates the simulator and the connection
     '''
 
-    def __init__(self):
+    def __init__(self, visualization):
         # Create environment
-        self.env = L2M2019Env(visualize=True)
+        self.env = L2M2019Env(visualize=visualization)
         self.observation = self.env.reset()
         self.reward = 0
 

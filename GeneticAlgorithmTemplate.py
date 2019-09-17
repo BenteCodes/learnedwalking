@@ -52,15 +52,6 @@ class GeneticAlgorithmTemplate(ABC):
     def __init__(self, popsize, mutation_rate, crossover_rate, iterations):
         self.checkParameters(popsize, mutation_rate, crossover_rate, iterations)
         
-        self.max_iterations = iterations
-        
-        self.initRobotControl()
-
-        self.initPopGen(popsize, mutation_rate, crossover_rate)        
-        self.init_population()
-        
-        self.initFitnessFunc()
-
     def simulateFitnessOfNetwork(self, network):
         self.robot_control.startSimulation()
         self.walkInSimulator(network)
