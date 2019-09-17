@@ -89,7 +89,7 @@ class GeneticAlgorithmTemplate(ABC):
         fitnessList = []
 
         # create a list of networks their fitness
-        for index in range(0, len(self.population)):
+        for index in range(0, len(self.population)): 
             fitness = self.getFitnessAveragedOverXTimes(self.population[index], self.simulator_repetitions)
             fitnessList.append([self.population[index], fitness])
         
