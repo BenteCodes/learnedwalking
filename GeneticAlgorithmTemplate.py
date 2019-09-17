@@ -13,6 +13,7 @@ class GeneticAlgorithmTemplate(ABC):
 
     number_of_steps_in_simulator = 100
     simulator_repetitions = 1
+    number_of_documented_fitnesses_per_iteration = 5
 
     @abstractmethod
     def init_population(self):
@@ -106,7 +107,7 @@ class GeneticAlgorithmTemplate(ABC):
         return [row[0] for row in fitnessList]
 
     def safeMeanAndTop5Fitnesses(self, mean_fitness, fitnessList):
-        SafeData.safeMeanAndTop5Fitnesses(mean_fitness, [row[1] for row in fitnessList][:5])
+        SafeData.safeMeanAndTop5Fitnesses(mean_fitness, [row[1] for row in fitnessList][:self.number_of_documented_fitnesses_per_iteration])
 
     def safeNetwork(self, best_network):
         SafeData.safeNetwork(best_network)
