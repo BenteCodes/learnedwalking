@@ -26,19 +26,44 @@ def test_initNetwork():
     assert nw.number_of_input_units == 10, 'wrong number of input units'
     assert nw.number_of_hidden_units == 4, 'wrong number of hidden units'
     assert nw.number_of_output_units == 20, 'wrong number of output units'
-    assert nw.are_there_non_zero_outputs_value == False, 'wrongly initialized are_there_non_zero_outputs_value'
+
+    
+def test_inputToHidden(): 
+    hidden_to_hidden = [[1, 2, 3, 4]]
+    last_output_hidden = [[1, 2, 3, 4]]
+    nw_input = np.array([[1, 2, 3, 4]])
+    weights = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
+    value_hidden_neurons = np.matmul(nw_input, weights)
+        
+    results = [10, 20, 30, 40]
+    for index in range(0, 4):
+        assert value_hidden_neurons[0][index] == results[index], 'wrong results'
+        
+    print('happy')
+        
+    for index in range(0, 4):  # append the hidden layer inputs. this has to be done one by one, as they are not fully connected, but just one weight per line
+        value_hidden_neurons[0][index] += hidden_to_hidden[0][index] * last_output_hidden[0][index]
+        
+    results = [11, 24, 39, 56]
+    for index in range(0, 4):
+        assert value_hidden_neurons[0][index] == results[index], 'wrong results'
+         
+    print('happy')
 
 
-def test_areThereNonZeroOutputs():
-    weights = WalkingNetwork.generateRandomWeights()
-    nw = WalkingNetwork(weights)
-    assert nw.are_there_non_zero_outputs_value == False, 'are_there_non_zero_outputs_value wrongly set at the start'
-    nw.areThereNonZeroOutputs(np.array([[0, 0, 0, 0]]))
-    assert nw.are_there_non_zero_outputs_value == False, 'ZeroMovement not recognized'
-    nw.areThereNonZeroOutputs(np.array([[-1, 1, 0, 0]]))
-    assert nw.are_there_non_zero_outputs_value == True, 'Non-zero-movement not found'
+def test_hiddenToOutput():
+    last_output_hidden = [[5, 6, 7, 8]]
+    hidden_to_output_all = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], ]
+    value_output_neurons = np.matmul(last_output_hidden, hidden_to_output_all) 
+    
+    results = 26
+    for index in range(0, 20):
+        assert value_output_neurons[0][index] == (results * (index + 1)), 'wrong results'
 
-
+    
 def test_getInput():
     pass
 
