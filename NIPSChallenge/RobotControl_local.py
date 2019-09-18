@@ -34,7 +34,6 @@ class RobotControlNipsLocal(RobotControlAbstract):
         self.done = done
         self.reward += reward  # >TODO check if reward is cumulativ on it's own
        
-        return np.zeros((16, 1))  # TODO fix once real number is known
         # return self.prepareObersavationForNw(self.observation)
 
     def getEvalData(self):

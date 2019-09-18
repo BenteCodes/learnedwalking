@@ -24,50 +24,24 @@ class NetworkTemplate(Network3LayerAbstract):
     into one matrix.
     Only needed once per network
     ''' 
-
-    def prepareWeightsToHiddenUnits(self):
-        weights_to_hidden_units = np.concatenate((self.input_to_hidden_all, self.hidden_to_hidden), axis=0)
-        weights_to_hidden_units = np.transpose(weights_to_hidden_units)
-        return weights_to_hidden_units
     
     def getInputFromSimplePattern(self):
         return self.simple_pattern.nextStep()
 
-    '''
-    Creates one inputvector for every hidden neuron and saves them into a 
-    number_of_input_units X number_of_hidden_units matrix
-    '''
+    def computeHiddenOutputs(self):
+        nw_input = np.array([self.getInputFromSimplePattern()])
+        value_hidden_neurons = np.matmul(nw_input, self.input_to_hidden_all)
+        for index in range(0, self.number_of_hidden_units):
+            value_hidden_neurons[0][index] += self.hidden_to_hidden[0][index] * self.last_output_hidden[0][index]
+        
+        value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
+        self.last_output_hidden = self.applyActivationFunction(value_hidden_neurons)
 
-    def duplicateInputByNumberOfHiddenUnits(self, state_input):
-        state_input = np.array([state_input])
-        state_input = np.transpose(state_input)
-        input_matrix = state_input
-        for _i in range(1, self.number_of_hidden_units):
-            state_input = np.concatenate((state_input, input_matrix), axis=1)
-        return state_input
-
-    '''
-    Adds the previous output of the hidden units to the input vectors in the matrix
-    '''
-
-    def addRecurrentInputs(self, state_input):
-        assembled_hidden_input = np.concatenate((state_input, self.last_state_hidden), axis=0)
-        return assembled_hidden_input
-
-    '''
-    Fetches all input values and creates the matrix for the multiplication
-    '''
-
-    def createHiddenLayerInput(self):
-        oneD_input_vector = self.getInput()
-        number_of_input_units_times_number_of_hidden_units_matrix = self.duplicateInputByNumberOfHiddenUnits(oneD_input_vector)
-        values_into_hidden_units = self.addRecurrentInputs(number_of_input_units_times_number_of_hidden_units_matrix)
-        return values_into_hidden_units
-
-    '''
-    Applies the sigmoid function to all values in the matrix.
-    Afterwards streches and offsets the values so we get values between -1 and 1 instead of 0 and 1
-    '''
+    def computeOutputsFromHiddenOnwards(self):
+        value_output_neurons = np.matmul(self.last_output_hidden, self.hidden_to_output_all) 
+        value_output_neurons = self.normaliseNeuronInputSomewhat(value_output_neurons) 
+        network_output = self.applyActivationFunction(value_output_neurons)
+        return network_output
 
     '''
     One run through the network. From input to hidden, hidden to output
@@ -75,26 +49,15 @@ class NetworkTemplate(Network3LayerAbstract):
     '''
 
     def computeOneStep(self):
-        hidden_layer_input = self.createHiddenLayerInput()
+        self.computeHiddenOutputs()
         
-        # Actual computation of the output of the hidden layer
-        # returns a 1 X number_of_hidden_units matrix
-        diagonal_of_matrix_mul = np.matrix([np.diagonal(self.weights_to_hidden_units * hidden_layer_input, 0)])
-        # diagonal_of_matrix_mul = self.normaliseNeuronInputSomewhat(diagonal_of_matrix_mul)
-        self.last_state_hidden = self.applyActivationFunction(diagonal_of_matrix_mul)
-        
-        # Actual computation of the output of the network
-        # returns a number_of_output_units X 1 matrixs
-        matrix_mul = self.last_state_hidden * self.hidden_to_output_all
-        # matrix_mul = self.normaliseNeuronInputSomewhat(matrix_mul)
-        network_output = self.applyActivationFunction(matrix_mul)
-        return network_output
+        return self.computeOutputsFromHiddenOnwards()
     
     def normaliseNeuronInputSomewhat(self, values):
-        return np.divide(values, 1)
+        return np.divide(values, len(values[0]) / 2)
 
     def resetHiddenLayer(self):
-        self.last_state_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
+        self.last_output_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
     
     def getWeightAt(self, index):
         return self.weights[index]
