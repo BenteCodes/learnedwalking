@@ -14,6 +14,7 @@ class SimplePatternGenerator:
     number_of_patterns = 4
     step_length = 1
     phase = 100
+    half_phase = 50
 
     def __init__(self):
         self.pattern = [self.getPatternFromPath(self.path1),
@@ -49,6 +50,6 @@ class SimplePatternGenerator:
             self.currentstep -= self.phase
             
     def increasePhaseByPI(self):
-        self.currentstep += (self.phase / 2)
+        self.currentstep += self.half_phase
         self._handleOverflow()
         
