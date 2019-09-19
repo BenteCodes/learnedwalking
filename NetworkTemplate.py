@@ -31,7 +31,7 @@ class NetworkTemplate(Network3LayerAbstract):
     def computeHiddenOutputs(self):
         nw_input = np.array([self.getInputFromSimplePattern()])
         value_hidden_neurons = np.matmul(nw_input, self.input_to_hidden_all)
-        for index in range(0, self.number_of_hidden_units):
+        for index in range(0, self.number_of_hidden_units):  # append the hidden layer inputs. this has to be done one by one, as they are not fully connected, but just one weight per line
             value_hidden_neurons[0][index] += self.hidden_to_hidden[0][index] * self.last_output_hidden[0][index]
         
         value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
