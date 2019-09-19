@@ -16,6 +16,25 @@ class NetworkTemplate(Network3LayerAbstract):
         if not(len(weights) == self.number_of_weights):
             print("Paramcheck: Weights of incorrect number_of_weights")
 
+    def initNetwork(self, weights):
+        self.weights = weights
+        self.last_output_hidden = []
+        self.resetHiddenLayer() 
+        
+        position_start = 0
+        position_end = self.number_of_input_units * self.number_of_hidden_units
+        self.input_to_hidden_all = np.array([weights[position_start:position_end]])
+        self.input_to_hidden_all = np.reshape(self.input_to_hidden_all, (self.number_of_input_units, self.number_of_hidden_units))
+
+        position_start = position_end
+        position_end += self.number_of_hidden_units        
+        self.hidden_to_hidden = np.array([weights[position_start:position_end]])
+
+        position_start = position_end
+        position_end += (self.number_of_hidden_units * self.number_of_output_units)         
+        self.hidden_to_output_all = np.array([weights[position_start:position_end]])
+        self.hidden_to_output_all = np.reshape(self.hidden_to_output_all, (self.number_of_hidden_units, self.number_of_output_units))  # sort after connection not just a long list
+
     def initInputPattern(self):
         self.simple_pattern = SimplePatternGenerator()    
     
