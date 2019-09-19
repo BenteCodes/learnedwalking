@@ -10,7 +10,7 @@ class WalkingNetwork(NetworkTemplate):
     number_of_hidden_units = 4
     number_of_output_units = 20
     number_of_weights = (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)
-    start_weights = [-1, 1]
+    start_weights_range = [-1, 1]
 
     # @input weights weights of the network
     def getInput(self):

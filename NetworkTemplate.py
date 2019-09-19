@@ -28,17 +28,17 @@ class NetworkTemplate(Network3LayerAbstract):
     def getInputFromSimplePattern(self):
         return self.simple_pattern.nextStep()
 
-    def computeHiddenOutputs(self):
-        nw_input = np.array([self.getInputFromSimplePattern()])
-        value_hidden_neurons = np.matmul(nw_input, self.input_to_hidden_all)
+    def computeHiddenOutputs(self, nw_input, input_to_hidden_all, last_output_hidden, hidden_to_hidden):
+        
+        value_hidden_neurons = np.matmul(nw_input, input_to_hidden_all)
         for index in range(0, self.number_of_hidden_units):  # append the hidden layer inputs. this has to be done one by one, as they are not fully connected, but just one weight per line
-            value_hidden_neurons[0][index] += self.hidden_to_hidden[0][index] * self.last_output_hidden[0][index]
+            value_hidden_neurons[0][index] += hidden_to_hidden[0][index] * last_output_hidden[0][index]
         
         value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
-        self.last_output_hidden = self.applyActivationFunction(value_hidden_neurons)
+        return self.applyActivationFunction(value_hidden_neurons)
 
-    def computeOutputsFromHiddenOnwards(self):
-        value_output_neurons = np.matmul(self.last_output_hidden, self.hidden_to_output_all) 
+    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all):
+        value_output_neurons = np.matmul(last_output_hidden, hidden_to_output_all) 
         value_output_neurons = self.normaliseNeuronInputSomewhat(value_output_neurons) 
         network_output = self.applyActivationFunction(value_output_neurons)
         return network_output
@@ -49,9 +49,10 @@ class NetworkTemplate(Network3LayerAbstract):
     '''
 
     def computeOneStep(self):
-        self.computeHiddenOutputs()
+        nw_input = np.array([self.getInputFromSimplePattern()])
+        self.last_output_hidden = self.computeHiddenOutputs(nw_input, self.input_to_hidden_all, self.last_output_hidden, self.hidden_to_hidden)
         
-        return self.computeOutputsFromHiddenOnwards()
+        return self.computeOutputsFromHiddenOnwards(self.last_output_hidden, self.hidden_to_output_all)
     
     def normaliseNeuronInputSomewhat(self, values):
         return np.divide(values, len(values[0]) / 2)
@@ -70,7 +71,7 @@ class NetworkTemplate(Network3LayerAbstract):
     def generateRandomWeights(cls):
         weights = []
         for _i in range(0, cls.number_of_weights):
-            weights.append(random.uniform(cls.start_weights[0], cls.start_weights[1]))
+            weights.append(random.uniform(cls.start_weights_range[0], cls.start_weights_range[1]))
             
         return weights
 

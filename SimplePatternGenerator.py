@@ -11,18 +11,19 @@ class SimplePatternGenerator:
     path3 = (base_path / 'blopppattern.csv').resolve()
     path4 = (base_path / 'broadsinepattern.csv').resolve()
 
+    number_of_patterns = 4
+    step_length = 1
+    phase = 100
+
     def __init__(self):
-        self.pattern1 = self.getPatternFromPath(self.path1)
-        self.pattern2 = self.getPatternFromPath(self.path2)
-        self.pattern3 = self.getPatternFromPath(self.path3)
-        self.pattern4 = self.getPatternFromPath(self.path4)
+        self.pattern = [self.getPatternFromPath(self.path1),
+                        self.getPatternFromPath(self.path2),
+                        self.getPatternFromPath(self.path3),
+                        self.getPatternFromPath(self.path4)]
 
-        self.value1 = 0 
-        self.value2 = 0
-        self.value3 = 0
-        self.value4 = 0
+        self.values = [0, 0, 0, 0]
         self.currentstep = 0
-
+        
     def getPatternFromPath(self, path):
         tmparray = []
         with open(str(path), 'r') as csvfile:
@@ -32,14 +33,22 @@ class SimplePatternGenerator:
         return tmparray
 
     def nextStep(self):
-        self.currentstep = self.currentstep + 4
-        if self.currentstep >= 100:
-            self.currentstep = 0
-        self.value1 = self.pattern1[self.currentstep]
-        self.value2 = self.pattern2[self.currentstep]
-        self.value3 = self.pattern3[self.currentstep]
-        self.value4 = self.pattern4[self.currentstep]
-        return [self.value1, self.value2, self.value3, self.value4]
+        self.currentstep += self.step_length
+        self._handleOverflow()
+
+        for index in range(0, self.number_of_patterns):
+            self.values[index] = self.pattern[index][self.currentstep]
+            
+        return self.values
 
     def getNumberOfPatterns(self):
-        return 4
+        return self.number_of_patterns
+    
+    def _handleOverflow(self):
+        if self.currentstep >= self.phase:
+            self.currentstep -= self.phase
+            
+    def increasePhaseByPI(self):
+        self.currentstep += (self.phase / 2)
+        self._handleOverflow()
+        

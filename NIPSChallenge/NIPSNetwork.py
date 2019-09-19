@@ -15,7 +15,7 @@ class NIPSNetwork(NetworkTemplate):
     number_of_hidden_units = 22
     number_of_output_units = 22
     number_of_weights = (number_of_input_units * number_of_hidden_units) + number_of_hidden_units + (number_of_hidden_units * number_of_output_units)
-    start_weights = [-8, 8]
+    start_weights_range = [-8, 8]
     
     def getInput(self):
         return self.getInputFromSimplePattern()
