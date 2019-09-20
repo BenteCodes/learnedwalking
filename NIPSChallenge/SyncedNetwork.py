@@ -28,7 +28,7 @@ class SyncedNetwork(Network3LayerAbstract):
         output_part1 = self.nw1.computeOneStep()
         output_part2 = self.nw2.computeOneStep()
         
-        return [np.append(output_part1, output_part2)]
+        return np.append(output_part1, output_part2)
     
     def resetHiddenLayer(self):
         self.nw1.resetHiddenLayer()
@@ -41,8 +41,8 @@ class SyncedNetwork(Network3LayerAbstract):
         pass
 
     @staticmethod
-    def getNumberOfWeights(cls):
-        return cls.number_of_weights
+    def getNumberOfWeights():
+        return NIPSNetwork.getNumberOfWeights()
     
     @staticmethod
     def generateRandomWeights():

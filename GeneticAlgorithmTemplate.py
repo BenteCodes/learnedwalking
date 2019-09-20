@@ -14,6 +14,8 @@ class GeneticAlgorithmTemplate(ABC):
     number_of_steps_in_simulator = 100
     simulator_repetitions = 1
     number_of_documented_fitnesses_per_iteration = 5
+    fall_foreward_action = np.array([1,1,1,1,0,1,1,0,0,0,1,
+                                     1,1,1,1,0,1,1,0,0,0,1])
 
     @abstractmethod
     def init_population(self):
@@ -63,8 +65,11 @@ class GeneticAlgorithmTemplate(ABC):
         return fitness
 
     def walkInSimulator(self, network):
-        for _i in range(0, self.number_of_steps_in_simulator):
-            self.robot_control.walkRobot(network.computeOneStep())
+        for i in range(0, self.number_of_steps_in_simulator):
+            if i <= 90:
+                self.robot_control.walkRobot(self.fall_foreward_action)
+            else:
+                self.robot_control.walkRobot(network.computeOneStep())
             # sensor_data = self.robot_control.walkRobot(network.computeOneStep())
             # network.takeInputFromSim(sensor_data)
             if(self.robot_control.robotFell()):
