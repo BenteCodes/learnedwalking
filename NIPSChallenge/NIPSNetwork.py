@@ -10,7 +10,7 @@ from NetworkTemplate import NetworkTemplate
 class NIPSNetwork(NetworkTemplate):
     
     number_of_sensory_inputs = 0
-    number_of_pattern_inputs = 4
+    number_of_pattern_inputs = 5
     number_of_input_units = number_of_pattern_inputs + number_of_sensory_inputs
     number_of_hidden_units = 11
     number_of_output_units = 11
