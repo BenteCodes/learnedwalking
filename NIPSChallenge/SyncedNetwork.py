@@ -19,6 +19,7 @@ class SyncedNetwork(Network3LayerAbstract):
     start_weights_range = [-8, 8]
 
     def __init__(self, weights):
+        self.weights = weights
         self.nw1 = NIPSNetwork(weights)
         self.nw2 = NIPSNetwork(weights)
         
@@ -39,6 +40,9 @@ class SyncedNetwork(Network3LayerAbstract):
     
     def takeInputFromSim(self, data):
         pass
+    
+    def getWeights(self):
+        self.nw1.getWeights()
 
     @staticmethod
     def getNumberOfWeights(cls):
