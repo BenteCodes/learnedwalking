@@ -5,7 +5,6 @@ Created on 14.09.2019
 '''
 from NIPSChallenge.GeneticAlgorithm import GeneticAlgorithm
 import SafeData
-from NIPSChallenge.SyncedNetwork import SyncedNetwork
 
 
 def fullRun():
@@ -19,9 +18,5 @@ def loadpop():
     return SafeData.loadPopulation()
 
 
-SyncedNetwork.generateRandomWeights()
-print()
 fullRun()
-# pop = loadpop()
-# print(pop[6].weights[119])
 

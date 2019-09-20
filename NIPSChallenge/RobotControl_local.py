@@ -29,7 +29,7 @@ class RobotControlNipsLocal(RobotControlAbstract):
         return self.done
 
     def walkRobot(self, motor_values):
-        [observation, reward, done, _info] = self.env.step(motor_values[0])
+        [observation, reward, done, _info] = self.env.step(motor_values)
         self.observation = observation
         self.done = done
         self.reward += reward  # >TODO check if reward is cumulativ on it's own
