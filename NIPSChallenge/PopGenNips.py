@@ -5,7 +5,7 @@ Created on Sep 16, 2019
 '''
 from PopulationGeneratorAbstract import PopulationGeneratorAbstract 
 import random
-from NIPSChallenge.NIPSNetwork import NIPSNetwork
+from NIPSChallenge.SyncedNetwork import SyncedNetwork
 
 
 # genetic algorithm to learn basic pattern
@@ -59,7 +59,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
                 weight += mutation
             new_weights.append(weight)
             
-        return NIPSNetwork(new_weights)
+        return SyncedNetwork(new_weights)
 
     def crossoverNetwork(self, network1, network2):
         network_size = network1.getNumberOfWeights()
@@ -70,7 +70,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
                 new_weights.append(network1.getWeightAt(index))
             else:
                 new_weights.append(network2.getWeightAt(index))
-        return NIPSNetwork(new_weights)
+        return SyncedNetwork(new_weights)
     
     def getRandomIndexBetterPreferred(self, ranked):
         rankSum = sum(range(self.size_of_population + 1))
@@ -87,7 +87,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
     def initPopulation(self):
         population = []
         for _1 in range(0, self.size_of_population):     
-            population.append(NIPSNetwork(NIPSNetwork.generateRandomWeights()))
+            population.append(SyncedNetwork(SyncedNetwork.generateRandomWeights()))
         
         return population
         

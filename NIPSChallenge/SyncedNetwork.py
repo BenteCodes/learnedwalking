@@ -27,7 +27,7 @@ class SyncedNetwork(Network3LayerAbstract):
     def computeOneStep(self):
         output_part1 = self.nw1.computeOneStep()
         output_part2 = self.nw2.computeOneStep()
-        print(len(np.append(output_part1, output_part2)))
+        
         return np.append(output_part1, output_part2)
     
     def resetHiddenLayer(self):
