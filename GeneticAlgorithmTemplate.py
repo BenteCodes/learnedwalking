@@ -107,9 +107,10 @@ class GeneticAlgorithmTemplate(ABC):
         SafeData.safeMeanAndTopXFitnesses(mean_fitness, [row[1] for row in fitnessList][:self.number_of_documented_fitnesses_per_iteration])
 
     def evolve(self):
-        for curr_it in range(1, self.max_iterations + 1):
+        curr_it = 1
+        while True:
             print("Current iteration:" + str(curr_it))
             rankedNetworks = self.getRankedNetworks()
             SafeData.safePopulation(self.population)
             self.population = self.pop_generator.createNextGeneration(rankedNetworks)
-
+            curr_it += 1
