@@ -40,5 +40,5 @@ def loadPopulation():
         data = json.load(json_file)
     for nw in data['networks']:
         population.append(NIPSNetwork(nw['weights']))
-    print("loaded population to json")
+    print("loaded population from json")
     return population
