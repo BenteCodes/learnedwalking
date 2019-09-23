@@ -13,6 +13,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
 
     max_weight_change = 1
     number_of_kept_best_networks = 2
+    network_type = SyncedNetwork
 
     def __init__(self, size_of_population, mutation_rate, crossover_rate):
         self.size_of_population = size_of_population
@@ -59,7 +60,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
                 weight += mutation
             new_weights.append(weight)
             
-        return SyncedNetwork(new_weights)
+        return self.network_type(new_weights)
 
     def crossoverNetwork(self, network1, network2):
         network_size = network1.getNumberOfWeights()
@@ -70,7 +71,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
                 new_weights.append(network1.getWeightAt(index))
             else:
                 new_weights.append(network2.getWeightAt(index))
-        return SyncedNetwork(new_weights)
+        return self.network_type(new_weights)
     
     def getRandomIndexBetterPreferred(self, ranked):
         rankSum = sum(range(self.size_of_population + 1))
@@ -87,7 +88,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
     def initPopulation(self):
         population = []
         for _1 in range(0, self.size_of_population):     
-            population.append(SyncedNetwork(SyncedNetwork.generateRandomWeights()))
+            population.append(self.network_type(self.network_type.generateRandomWeights()))
         
         return population
         
