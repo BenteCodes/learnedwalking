@@ -36,7 +36,7 @@ def safePopulation(pop):
     
 def loadPopulation():
     population = []
-    with open('population_friday.json') as json_file:
+    with open('office_run.json') as json_file:
         data = json.load(json_file)
     for nw in data['networks']:
         population.append(NIPSNetwork(nw['weights']))
