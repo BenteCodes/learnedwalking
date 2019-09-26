@@ -11,7 +11,7 @@ from NIPSChallenge.SyncedNetwork import SyncedNetwork
 # genetic algorithm to learn basic pattern
 class PopulationGeneratorNips(PopulationGeneratorAbstract):
 
-    max_weight_change = 1
+    max_weight_change = 5
     number_of_kept_best_networks = 2
     network_type = SyncedNetwork
 

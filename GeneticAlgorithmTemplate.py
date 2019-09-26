@@ -66,7 +66,7 @@ class GeneticAlgorithmTemplate(ABC):
 
     def walkInSimulator(self, network):
         for i in range(0, self.number_of_steps_in_simulator):
-            if i <= 90:
+            if i <= 50:
                 self.robot_control.walkRobot(self.fall_foreward_action)
             else:
                 self.robot_control.walkRobot(network.computeOneStep())
