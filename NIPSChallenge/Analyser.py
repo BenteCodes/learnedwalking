@@ -7,6 +7,7 @@ Created on 23.09.2019
 from NIPSChallenge.NIPSNetwork import NIPSNetwork
 import numpy as np
 import matplotlib.pyplot as plt
+import SafeData
 
 nw = NIPSNetwork(NIPSNetwork.generateRandomWeights())
 
@@ -29,7 +30,7 @@ def hiddenWeights(nw):
     print("Hidden weights", nw.hidden_to_hidden)
 
 
-hiddenWeights(nw)
+# hiddenWeights(nw)
 
 
 def getOutputData(nw):
@@ -69,3 +70,10 @@ def getHiddenLayerOutput(nw):
     plt.show()
 
 # getHiddenLayerOutput(nw)
+pop = SafeData.loadPopulation()
+nw = pop[0].nw1
+hiddenWeights(nw)
+weightsPerInput(nw)
+getHiddenLayerOutput(nw)
+getOutputData(nw)
+
