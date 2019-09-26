@@ -111,6 +111,6 @@ class GeneticAlgorithmTemplate(ABC):
         while True:
             print("Current iteration:" + str(curr_it))
             rankedNetworks = self.getRankedNetworks()
-            # SafeData.safePopulation(self.population)
+            SafeData.safePopulation(self.population)
             self.population = self.pop_generator.createNextGeneration(rankedNetworks)
             curr_it += 1
