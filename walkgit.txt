@@ -107,3 +107,8 @@ Please make sure you have the correct access rights
 and the repository exists.
 To github.com:BenteCodes/learnedwalking.git
    f0d7f26..bf8fca3  master -> master
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
