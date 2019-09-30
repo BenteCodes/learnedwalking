@@ -30,14 +30,14 @@ def safePopulation(pop):
             'weights': nw.weights,
             })
     
-    with open('office_run.json', 'w') as outfile:
+    with open('office_run.json2', 'w') as outfile:
         json.dump(data, outfile)
     print("safed population to json")
 
     
 def loadPopulation():
     population = []
-    with open('office_run.json') as json_file:
+    with open('office_run.json2') as json_file:
         data = json.load(json_file)
         
     zeros = np.zeros(66)
