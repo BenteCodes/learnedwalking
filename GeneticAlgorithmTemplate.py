@@ -14,8 +14,8 @@ class GeneticAlgorithmTemplate(ABC):
     number_of_steps_in_simulator = 100
     simulator_repetitions = 1
     number_of_documented_fitnesses_per_iteration = 5
-    fall_foreward_action = np.array([1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1,
-                                     1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1])
+    fall_foreward_action = np.array([1, 1, 0, 0, 0.5, 0, 0, 0, 0, 0, 0.5,
+                                     0, 0, 1, 0, 0, 0.5, 0, 0, 0, 0, 0.5])
 
     @abstractmethod
     def init_population(self):
