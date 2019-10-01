@@ -12,8 +12,8 @@ def fullRun():
     crossover = 20
     
     visualization = False
-    pop_size = 30
-    cord = GeneticAlgorithm(pop_size, mutate, crossover, 200000, visualization)
+    pop_size = 50
+    cord = GeneticAlgorithm(pop_size, mutate, crossover, 50, visualization)
 
     #cord.population = loadpop()  # [:5]
 
@@ -24,5 +24,6 @@ def loadpop():
     return SafeData.loadPopulation()
 
 
-fullRun()
+while True:
+    fullRun()
 

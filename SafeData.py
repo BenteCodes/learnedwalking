@@ -41,8 +41,8 @@ def loadPopulation():
     with open('office_run3.json') as json_file:
         data = json.load(json_file)
         
-    zeros = np.zeros(66)
+    #zeros = np.zeros(66)
     for nw in data['networks']:
-        population.append(SyncedNetwork(np.append(nw['weights'], zeros)))  # TODO remove this after first load
+        population.append(SyncedNetwork(np.append(nw['weights'])))  # TODO remove this after first load
     print("loaded population from json")
     return population

@@ -108,7 +108,7 @@ class GeneticAlgorithmTemplate(ABC):
 
     def evolve(self):
         curr_it = 1
-        while True:
+        while curr_it < 51:
             print("Current iteration:" + str(curr_it))
             rankedNetworks = self.getRankedNetworks()
             SafeData.safePopulation(self.population)
