@@ -43,6 +43,6 @@ def loadPopulation():
         
     #zeros = np.zeros(66)
     for nw in data['networks']:
-        population.append(SyncedNetwork(np.append(nw['weights'])))  # TODO remove this after first load
+        population.append(SyncedNetwork(nw['weights']))  # TODO remove this after first load
     print("loaded population from json")
     return population

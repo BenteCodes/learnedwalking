@@ -15,7 +15,7 @@ def fullRun():
     pop_size = 50
     cord = GeneticAlgorithm(pop_size, mutate, crossover, 50, visualization)
 
-    #cord.population = loadpop()  # [:5]
+    cord.population = loadpop()  # [:5]
 
     cord.evolve()
 
