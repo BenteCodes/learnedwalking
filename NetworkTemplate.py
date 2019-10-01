@@ -35,6 +35,11 @@ class NetworkTemplate(Network3LayerAbstract):
         self.hidden_to_output_all = np.array([weights[position_start:position_end]])
         self.hidden_to_output_all = np.reshape(self.hidden_to_output_all, (self.number_of_hidden_units, self.number_of_output_units))  # sort after connection not just a long list
 
+        position_start = position_end
+        position_end += (self.number_of_input_units * self.number_of_output_units)
+        self.input_to_output_all = np.array([weights[position_start:position_end]])
+        self.input_to_output_all = np.reshape(self.input_to_output_all, (self.number_of_input_units, self.number_of_output_units))  # sort after connection not just a long list
+        
     def initInputPattern(self):
         self.simple_pattern = SimplePatternGenerator()    
     
@@ -56,10 +61,14 @@ class NetworkTemplate(Network3LayerAbstract):
         value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
         return self.applyActivationFunction(value_hidden_neurons)
 
-    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all):
-        value_output_neurons = np.matmul(last_output_hidden, hidden_to_output_all) 
-        value_output_neurons = self.normaliseNeuronInputSomewhat(value_output_neurons) 
-        network_output = self.applyActivationFunction(value_output_neurons)
+    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all, input, input_to_output_all):
+        value_output_neurons1 = np.matmul(last_output_hidden, hidden_to_output_all) 
+        value_output_neurons1 = self.normaliseNeuronInputSomewhat(value_output_neurons1) 
+        
+        value_output_neurons2 = np.matmul(input, input_to_output_all)
+        value_output_neurons2 = self.normaliseNeuronInputSomewhat(value_output_neurons2) 
+        
+        network_output = self.applyActivationFunction(value_output_neurons1 + value_output_neurons2)
         return network_output
 
     '''
@@ -71,7 +80,7 @@ class NetworkTemplate(Network3LayerAbstract):
         nw_input = np.array([self.getInputFromSimplePattern()])
         self.last_output_hidden = self.computeHiddenOutputs(nw_input, self.input_to_hidden_all, self.last_output_hidden, self.hidden_to_hidden)
         
-        return self.computeOutputsFromHiddenOnwards(self.last_output_hidden, self.hidden_to_output_all)
+        return self.computeOutputsFromHiddenOnwards(self.last_output_hidden, self.hidden_to_output_all, nw_input, self.input_to_output_all)
     
     def normaliseNeuronInputSomewhat(self, values):
         return np.divide(values, len(values[0]) / 2)

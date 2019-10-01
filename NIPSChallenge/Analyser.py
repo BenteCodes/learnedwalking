@@ -29,7 +29,6 @@ def hiddenWeights(nw):
     # no_hiddens = 11
     print("Hidden weights", nw.hidden_to_hidden)
 
-
 # hiddenWeights(nw)
 
 
@@ -69,11 +68,12 @@ def getHiddenLayerOutput(nw):
     
     plt.show()
 
+
 # getHiddenLayerOutput(nw)
 pop = SafeData.loadPopulation()
 nw = pop[0].nw1
 hiddenWeights(nw)
 weightsPerInput(nw)
 getHiddenLayerOutput(nw)
-getOutputData(nw)
+# getOutputData(nw)
 
