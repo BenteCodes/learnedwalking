@@ -9,8 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import SafeData
 
-nw = NIPSNetwork(NIPSNetwork.generateRandomWeights())
-
 
 def weightsPerInput(nw):
     number_of_input = nw.number_of_input_units
@@ -70,10 +68,12 @@ def getHiddenLayerOutput(nw):
     plt.title('Hidden Layer outputs')
     plt.show()
 
+# nw = NIPSNetwork(NIPSNetwork.generateRandomWeights())
 
-# getHiddenLayerOutput(nw)
+
 pop = SafeData.loadPopulation('office_run3.json')
-nw = pop[1].nw1
+nw = pop[0].nw1
+
 hiddenWeights(nw)
 weightsPerInput(nw)
 getHiddenLayerOutput(nw)

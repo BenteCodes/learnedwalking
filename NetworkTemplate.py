@@ -58,7 +58,7 @@ class NetworkTemplate(Network3LayerAbstract):
             value_hidden_neurons[0][index] += hidden_to_hidden[0][index] * last_output_hidden[0][index]
         
         value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
-        # value_hidden_neurons = self.applyActivationFunction(value_hidden_neurons)
+        value_hidden_neurons = (self.applyActivationFunction(value_hidden_neurons))  # TODO monitor this
         
         return value_hidden_neurons
 
