@@ -46,6 +46,7 @@ def getOutputData(nw):
     for i in range(0, no_outputs):
         plt.plot(x, y[i])
     
+    plt.title('Output Layer outputs')
     plt.show()
 
 # getOutputData(nw)
@@ -66,14 +67,15 @@ def getHiddenLayerOutput(nw):
     for i in range(0, no_hiddens):
         plt.plot(x, y[i])
     
+    plt.title('Hidden Layer outputs')
     plt.show()
 
 
 # getHiddenLayerOutput(nw)
-pop = SafeData.loadPopulation()
-nw = pop[0].nw1
+pop = SafeData.loadPopulation('office_run3.json')
+nw = pop[1].nw1
 hiddenWeights(nw)
 weightsPerInput(nw)
 getHiddenLayerOutput(nw)
-# getOutputData(nw)
+getOutputData(nw)
 

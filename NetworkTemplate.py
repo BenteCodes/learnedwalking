@@ -58,13 +58,15 @@ class NetworkTemplate(Network3LayerAbstract):
             value_hidden_neurons[0][index] += hidden_to_hidden[0][index] * last_output_hidden[0][index]
         
         value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
-        return self.applyActivationFunction(value_hidden_neurons)
+        # value_hidden_neurons = self.applyActivationFunction(value_hidden_neurons)
+        
+        return value_hidden_neurons
 
-    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all, input, input_to_output_all):
+    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all, nw_input, input_to_output_all):
         value_output_neurons1 = np.matmul(last_output_hidden, hidden_to_output_all) 
         value_output_neurons1 = self.normaliseNeuronInputSomewhat(value_output_neurons1) 
         
-        value_output_neurons2 = np.matmul(input, input_to_output_all)
+        value_output_neurons2 = np.matmul(nw_input, input_to_output_all)
         value_output_neurons2 = self.normaliseNeuronInputSomewhat(value_output_neurons2) 
         
         network_output = self.applyActivationFunction(value_output_neurons1 + value_output_neurons2)
