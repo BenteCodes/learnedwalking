@@ -29,7 +29,7 @@ def safePopulation(pop):
             'weights': nw.weights,
             })
     
-    with open('office_run3.json', 'w') as outfile:
+    with open('office_run4.json', 'w') as outfile:
         json.dump(data, outfile)
         
     print("safed population to json")
