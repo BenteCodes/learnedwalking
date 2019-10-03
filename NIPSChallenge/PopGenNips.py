@@ -11,7 +11,7 @@ from NIPSChallenge.SyncedNetwork import SyncedNetwork
 # genetic algorithm to learn basic pattern
 class PopulationGeneratorNips(PopulationGeneratorAbstract):
 
-    max_weight_change = 5
+    max_weight_change = 2
     number_of_kept_best_networks = 2
     network_type = SyncedNetwork
 
@@ -58,6 +58,10 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
             if random.randint(0, 100) <= self.mutation_rate:
                 mutation = random.uniform(-self.max_weight_change, self.max_weight_change)
                 weight += mutation
+                if weight < -20:
+                    weight = -20
+                if weight > 20:
+                    weight = 20
             new_weights.append(weight)
             
         return self.network_type(new_weights)
