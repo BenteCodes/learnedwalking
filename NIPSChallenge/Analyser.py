@@ -68,11 +68,11 @@ def getHiddenLayerOutput(nw):
     plt.title('Hidden Layer outputs')
     plt.show()
 
-# nw = NIPSNetwork(NIPSNetwork.generateRandomWeights())
 
+nw = NIPSNetwork(NIPSNetwork.generateRandomWeights())
 
-pop = SafeData.loadPopulation('office_run3.json')
-nw = pop[0].nw1
+# pop = SafeData.loadPopulation('office_run3.json')
+# nw = pop[0].nw1
 
 hiddenWeights(nw)
 weightsPerInput(nw)
