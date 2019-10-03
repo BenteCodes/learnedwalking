@@ -2,7 +2,6 @@ import csv
 from pathlib import Path
 import json
 from NIPSChallenge.SyncedNetwork import SyncedNetwork
-import numpy as np
 
     
 def safeMeanAndTopXFitnesses(mean_fitness, best_x_fitnesses):
@@ -36,13 +35,12 @@ def safePopulation(pop):
     print("safed population to json")
 
     
-def loadPopulation():
+def loadPopulation(file):
     population = []
-    with open('office_run3.json') as json_file:
+    with open(file) as json_file:
         data = json.load(json_file)
         
-    #zeros = np.zeros(66)
     for nw in data['networks']:
-        population.append(SyncedNetwork(nw['weights']))  # TODO remove this after first load
+        population.append(SyncedNetwork(nw['weights'])) 
     print("loaded population from json")
     return population

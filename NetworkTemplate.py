@@ -57,15 +57,17 @@ class NetworkTemplate(Network3LayerAbstract):
         for index in range(0, self.number_of_hidden_units):  # append the hidden layer inputs. this has to be done one by one, as they are not fully connected, but just one weight per line
             value_hidden_neurons[0][index] += hidden_to_hidden[0][index] * last_output_hidden[0][index]
         
-        value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons)
-        return self.applyActivationFunction(value_hidden_neurons)
-
-    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all, input, input_to_output_all):
-        value_output_neurons1 = np.matmul(last_output_hidden, hidden_to_output_all) 
-        value_output_neurons1 = self.normaliseNeuronInputSomewhat(value_output_neurons1) 
+        value_hidden_neurons = self.normaliseNeuronInputSomewhat(value_hidden_neurons, self.number_of_input_units + 1)
+        value_hidden_neurons = (self.applyActivationFunction(value_hidden_neurons))  # TODO monitor this
         
-        value_output_neurons2 = np.matmul(input, input_to_output_all)
-        value_output_neurons2 = self.normaliseNeuronInputSomewhat(value_output_neurons2) 
+        return value_hidden_neurons
+
+    def computeOutputsFromHiddenOnwards(self, last_output_hidden, hidden_to_output_all, nw_input, input_to_output_all):
+        value_output_neurons1 = np.matmul(last_output_hidden, hidden_to_output_all) 
+        value_output_neurons1 = self.normaliseNeuronInputSomewhat(value_output_neurons1, self.number_of_hidden_units) 
+        
+        value_output_neurons2 = np.matmul(nw_input, input_to_output_all)
+        value_output_neurons2 = self.normaliseNeuronInputSomewhat(value_output_neurons2, self.number_of_input_units) 
         
         network_output = self.applyActivationFunction(value_output_neurons1 + value_output_neurons2)
         return network_output
@@ -81,8 +83,8 @@ class NetworkTemplate(Network3LayerAbstract):
         
         return self.computeOutputsFromHiddenOnwards(self.last_output_hidden, self.hidden_to_output_all, nw_input, self.input_to_output_all)
     
-    def normaliseNeuronInputSomewhat(self, values):
-        return np.divide(values, len(values[0]) / 2)
+    def normaliseNeuronInputSomewhat(self, values, no_inputs):
+        return np.divide(values, no_inputs / 2)
 
     def resetHiddenLayer(self):
         self.last_output_hidden = np.ones((1, self.number_of_hidden_units))  # set to neutral element
