@@ -28,7 +28,7 @@ class NetworkTemplate(Network3LayerAbstract):
 
         position_start = position_end
         position_end += self.number_of_hidden_units        
-        self.hidden_to_hidden = np.array([weights[position_start:position_end]])
+        self.hidden_to_hidden = np.abs(np.array([weights[position_start:position_end]]))
 
         position_start = position_end
         position_end += (self.number_of_hidden_units * self.number_of_output_units)         
