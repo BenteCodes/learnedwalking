@@ -36,7 +36,7 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
             old_networks_sorted_by_fitness[i].resetHiddenLayer()
             new_population.append(old_networks_sorted_by_fitness[i])
         
-        while len(new_population) < self.size_of_population:
+        while len(new_population) < self.size_of_population-1:
             probability = random.randint(0, 100)
             # crossover with 5050 mutation
             if probability <= self.crossover_rate:
@@ -47,6 +47,8 @@ class PopulationGeneratorNips(PopulationGeneratorAbstract):
                 child_network = self.createMutantNetwork(self.getRandomIndexBetterPreferred(old_networks_sorted_by_fitness))
             
             new_population.append(child_network)
+        
+        new_population.append(self.network_type(self.network_type.generateRandomWeights()))
         
         return new_population
 
