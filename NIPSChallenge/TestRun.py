@@ -11,7 +11,7 @@ def fullRun():
     mutate = 80
     crossover = 20
     
-    visualization = False
+    visualization = True
     pop_size = 50
     cord = GeneticAlgorithm(pop_size, mutate, crossover, 50, visualization)
 
